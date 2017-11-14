@@ -16,7 +16,7 @@ data class Post(
 
         @ElementCollection
         @CollectionTable(name = "tags")
-        var tags: Set<Long> = emptySet(),
+        var tags: MutableSet<Long> = mutableSetOf(),
 
         @Column(insertable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
         @Temporal(TemporalType.TIMESTAMP)

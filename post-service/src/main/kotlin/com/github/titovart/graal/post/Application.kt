@@ -12,7 +12,7 @@ class Application {
 
     @Bean
     fun init(service: PostService) = CommandLineRunner {
-        service.save(Post("Post content #1", "Caption #1", 1, setOf(1L, 2L)))
+        service.save(Post("Post content #1", "Caption #1", 1, mutableSetOf(1L, 2L)))
         service.save(Post("Post content #2", "Caption #2", 1))
         service.save(Post("Post content #3", "Caption #3", 2))
     }

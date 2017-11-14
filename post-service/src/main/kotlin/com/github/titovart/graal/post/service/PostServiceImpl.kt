@@ -37,7 +37,7 @@ class PostServiceImpl(private val repository: PostRepository) : PostService {
 
         post.caption?.let { caption -> oldPost.caption = caption }
         post.content?.let { content -> oldPost.content = content }
-        post.tags?.let { tags -> oldPost.tags = tags }
+        post.tags?.let { tags -> oldPost.tags = tags.toMutableSet() }
         oldPost.lastModifiedDateTime = Date()
 
         return repository.save(oldPost)
