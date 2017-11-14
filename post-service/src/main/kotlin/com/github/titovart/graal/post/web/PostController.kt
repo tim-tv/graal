@@ -3,21 +3,29 @@ package com.github.titovart.graal.post.web
 import com.github.titovart.graal.post.model.Post
 import com.github.titovart.graal.post.model.PostRequest
 import com.github.titovart.graal.post.service.PostService
+import com.github.titovart.graal.post.validation.PostValidator
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
+import javax.validation.Valid
 
 
 @RestController
 @RequestMapping("/posts")
-class PostController(private val service: PostService) {
+class PostController(private val service: PostService, private val validator: PostValidator) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
+
+    @InitBinder
+    fun setupBiner(binder: WebDataBinder) {
+        binder.addValidators(validator)
+    }
 
     @GetMapping("/")
     fun findAll(pageable: Pageable): Page<Post> {
@@ -33,7 +41,9 @@ class PostController(private val service: PostService) {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody postRequest: Post, resp: HttpServletResponse): ResponseEntity<Unit> {
+    fun create(@Valid @RequestBody postRequest: Post,
+               resp: HttpServletResponse): ResponseEntity<Unit>
+    {
         service.save(postRequest).also {
             post ->
                 resp.addHeader(HttpHeaders.LOCATION, "/posts/${post.id}")
@@ -44,7 +54,9 @@ class PostController(private val service: PostService) {
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody postRequest: PostRequest): ResponseEntity<Post> {
+    fun update(@PathVariable id: Long,
+               @Valid @RequestBody postRequest: PostRequest): ResponseEntity<Post>
+    {
         val updatedUser = service.update(id, postRequest).also {
             post -> logger.info("[update($postRequest) => updated $post")
         }

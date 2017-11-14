@@ -8,8 +8,10 @@ import javax.persistence.*
 @Entity
 data class Post(
 
+        @Column(length = CONTENT_LEN)
         var content: String,
 
+        @Column(length = CAPTION_LEN)
         var caption: String?,
 
         var userId: Long,
@@ -28,4 +30,12 @@ data class Post(
 
         @Id @GeneratedValue(strategy = GenerationType.AUTO)
         val id: Long = -1
-)
+) {
+    companion object {
+        /** The max value of content length for posts checked by the database. */
+        const val CONTENT_LEN = 500
+
+        /** The max value of caption length for posts checked by the database. */
+        const val CAPTION_LEN = 200
+    }
+}
