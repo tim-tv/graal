@@ -1,2 +1,6 @@
 server:
-  port: 8080
+  port: 8883
+
+spring:
+  application:
+    name: hashtag-service
