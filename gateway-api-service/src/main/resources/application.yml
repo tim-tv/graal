@@ -6,10 +6,14 @@ spring:
     name: gateway-api-service
 
 zuul:
+  prefix: /api
   routes:
     users:
-      path: /api/users/**
+      path: /users/**
       url: http://localhost:8881/users
     tags:
-      path: /api/tags/**
+      path: /tags/**
       url: http://localhost:8883/hashtags
+    posts:
+      path: /internal/posts/**
+      url: http://localhost:8882/posts
