@@ -13,6 +13,10 @@ import javax.persistence.EntityNotFoundException
 @Service
 class PostServiceImpl(private val repository: PostRepository) : PostService {
 
+    override fun findByUserId(userId: Long, pageable: Pageable): Page<Post> {
+        return repository.findByUserId(userId, pageable)
+    }
+
     @Transactional(readOnly = true)
     override fun findById(postId: Long): Post {
         val post = repository.findById(postId)

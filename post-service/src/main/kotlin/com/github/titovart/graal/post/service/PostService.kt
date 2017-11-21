@@ -10,6 +10,8 @@ interface PostService {
 
     fun findById(postId: Long): Post
 
+    fun findByUserId(userId: Long, pageable: Pageable): Page<Post>
+
     fun findAll(pageable: Pageable): Page<Post>
 
     fun save(post: Post): Post

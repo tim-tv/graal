@@ -39,6 +39,13 @@ class PostController(private val service: PostService, private val validator: Po
         return service.findById(id).also { post -> logger.info("[findById($id)] => $post") }
     }
 
+    @GetMapping("/search")
+    fun findByUserId(@RequestParam("user_id") userId: Long, pageable: Pageable): Page<Post> {
+        return service.findByUserId(userId, pageable).also {
+            logger.info("[findByUserId($userId) => $it")
+        }
+    }
+
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@Valid @RequestBody postRequest: Post,
