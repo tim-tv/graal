@@ -16,7 +16,7 @@ class ExceptionController {
 
     data class ErrorResponse(val message: String)
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException::class)
     fun handleNotFound(exc: EntityNotFoundException): ErrorResponse {
         logger.info("[404] => ${exc.message}")
