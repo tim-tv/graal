@@ -49,7 +49,6 @@ repositories {
     maven("http://repo.spring.io/milestone")
 }
 
-
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:Finchley.M3")
@@ -58,15 +57,9 @@ dependencyManagement {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa")
-    compile("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    compile("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server")
 
-    compile("com.h2database:h2")
+
     compile("org.jetbrains.kotlin:kotlin-stdlib")
     compile("org.jetbrains.kotlin:kotlin-reflect")
-    testCompile("org.springframework.boot:spring-boot-starter-test") {
-        exclude(module = "junit")
-    }
-    testCompile("org.junit.jupiter:junit-jupiter-api")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine")
 }
