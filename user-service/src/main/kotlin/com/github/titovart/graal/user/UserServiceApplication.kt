@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean
 
 @EnableEurekaClient
 @SpringBootApplication
-class Application {
+class UserServiceApplication {
 
     @Bean
     fun init(service: UserService) = CommandLineRunner {
@@ -22,7 +22,7 @@ class Application {
     companion object {
 
         @JvmStatic fun main(args: Array<String>) {
-            SpringApplication.run(Application::class.java, *args)
+            SpringApplication.run(UserServiceApplication::class.java, *args)
         }
     }
 
