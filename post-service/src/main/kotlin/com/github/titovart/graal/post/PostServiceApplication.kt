@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean
 
 @SpringBootApplication
 @EnableDiscoveryClient
-class Application {
+class PostServiceApplication {
 
     @Bean
     fun init(service: PostService) = CommandLineRunner {
@@ -22,7 +22,7 @@ class Application {
     companion object {
 
         @JvmStatic fun main(args: Array<String>) {
-            SpringApplication.run(Application::class.java, *args)
+            SpringApplication.run(PostServiceApplication::class.java, *args)
         }
     }
 
