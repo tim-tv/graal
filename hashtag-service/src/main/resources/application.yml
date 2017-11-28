@@ -1,2 +1,25 @@
 server:
   port: 8883
+
+spring:
+  application:
+    name: hashtag-service
+
+logging:
+  level:
+    org.springframework.security: INFO
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka/

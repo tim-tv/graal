@@ -1,0 +1,51 @@
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+
+zuul:
+  ignoredServices: '*'
+  host:
+    connect-timeout-millis: 20000
+    socket-timeout-millis: 20000
+
+  routes:
+    user-service:
+        path: /users/**
+        serviceId: user-service
+        stripPrefix: false
+        sensitiveHeaders:
+
+    post-service:
+        path: /posts/**
+        serviceId: post-service
+        stripPrefix: false
+        sensitiveHeaders:
+
+    hashtag-service:
+        path: /tags/**
+        serviceId: hashtag-service
+        stripPrefix: false
+        sensitiveHeaders:
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 20000
+
+ribbon:
+  ReadTimeout: 20000
+  ConnectTimeout: 20000
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka/

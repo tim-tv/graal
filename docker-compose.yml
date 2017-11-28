@@ -1,0 +1,47 @@
+version: '2.1'
+services:
+
+  eureka-service:
+    image: titart/eureka-service
+    container_name: eureka-service
+    restart: always
+    ports:
+      - 8761:8761
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  gateway-service:
+    image: titart/gateway-service
+    restart: always
+    ports:
+      - 8080:8080
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  user-service:
+    image: titart/user-service
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  post-service:
+    image: titart/post-service
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  hashtag-service:
+    image: titart/hashtag-service
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"

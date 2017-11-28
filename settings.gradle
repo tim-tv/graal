@@ -2,6 +2,6 @@ rootProject.name = 'graal'
 include 'user-service'
 include 'hashtag-service'
 include 'post-service'
-include 'gateway-api-service'
-include 'eurika-service'
+include 'gateway-service'
+include 'eureka-service'
 

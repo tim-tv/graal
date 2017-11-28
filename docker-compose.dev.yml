@@ -1,0 +1,27 @@
+version: '2.1'
+services:
+
+  eureka-service:
+    build: eureka-service
+    ports:
+      - 8761:8761
+
+  gateway-service:
+    build: gateway-service
+    ports:
+      - 8080:8080
+
+  user-service:
+    build: user-service
+    ports:
+      - 8881:8881
+
+  post-service:
+    build: post-service
+    ports:
+      - 8882:8882
+
+  hashtag-service:
+    build: hashtag-service
+    ports:
+      - 8883:8883

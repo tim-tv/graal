@@ -1,4 +1,4 @@
-package com.github.titovart.graal.eurika
+package com.github.titovart.graal.eureka
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication

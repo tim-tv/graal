@@ -20,7 +20,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}"
         classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}"
         classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
-        classpath "org.junit.platform:junit-platform-gradle-plugin:1.0.1"
     }
 }
 
@@ -28,23 +27,21 @@ apply {
     plugin "application"
     plugin "kotlin"
     plugin "kotlin-spring"
-    plugin "kotlin-jpa"
     plugin "org.springframework.boot"
     plugin "io.spring.dependency-management"
-    plugin "org.junit.platform.gradle.plugin"
 }
 
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-mainClassName = "com.github.titovart.graal.user.UserServiceApplication"
+mainClassName = "com.github.titovart.graal.eureka.EurekaServiceApplication"
 
 jar {
-    baseName = "user-service"
+    baseName = "eureka-service"
     group = project.group
     version = project.version
     manifest {
-        attributes "Main-Class": "com.github.titovart.graal.user.UserServiceApplication"
+        attributes "Main-Class": "com.github.titovart.graal.eureka.EurekaServiceApplication"
     }
 }
 
@@ -61,18 +58,9 @@ dependencyManagement {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa")
-    compile("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-
-    compile("com.h2database:h2")
+    compile("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server")
 
     compile("org.jetbrains.kotlin:kotlin-stdlib")
     compile("org.jetbrains.kotlin:kotlin-reflect")
-    compile("org.jetbrains.kotlin:kotlin-test-junit")
 
-    testCompile("org.springframework.boot:spring-boot-starter-test") {
-        exclude module: "junit"
-    }
-    testCompile("org.junit.jupiter:junit-jupiter-api")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine")
 }

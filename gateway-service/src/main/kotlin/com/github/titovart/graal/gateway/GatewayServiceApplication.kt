@@ -9,12 +9,12 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy
 @SpringBootApplication
 @EnableFeignClients
 @EnableZuulProxy
-class Application {
+class GatewayServiceApplication {
 
     companion object {
 
         @JvmStatic fun main(args: Array<String>) {
-            SpringApplication.run(Application::class.java, *args)
+            SpringApplication.run(GatewayServiceApplication::class.java, *args)
         }
     }
 
