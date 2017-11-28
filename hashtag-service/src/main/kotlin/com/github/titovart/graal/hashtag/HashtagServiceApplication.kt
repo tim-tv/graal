@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean
 
 @EnableEurekaClient
 @SpringBootApplication
-class Application {
+class HashtagServiceApplication {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -29,7 +29,7 @@ class Application {
 
     companion object {
         @JvmStatic fun main(args: Array<String>) {
-            SpringApplication.run(Application::class.java, *args)
+            SpringApplication.run(HashtagServiceApplication::class.java, *args)
         }
     }
 }
