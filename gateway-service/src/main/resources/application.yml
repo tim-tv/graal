@@ -12,24 +12,13 @@ zuul:
     connect-timeout-millis: 20000
     socket-timeout-millis: 20000
 
+  prefix: /api/v1
+
   routes:
-    user-service:
-        path: /users/**
-        serviceId: user-service
-        stripPrefix: false
-        sensitiveHeaders:
-
-    post-service:
-        path: /posts/**
-        serviceId: post-service
-        stripPrefix: false
-        sensitiveHeaders:
-
-    hashtag-service:
-        path: /tags/**
-        serviceId: hashtag-service
-        stripPrefix: false
-        sensitiveHeaders:
+    user-aggr-service:
+      path: /**
+      serviceId: aggregation-service
+      stripPrefix: false
 
 hystrix:
   command:
