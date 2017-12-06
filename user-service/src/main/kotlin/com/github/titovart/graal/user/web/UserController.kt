@@ -18,7 +18,7 @@ class UserController(private val service: UserService) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    @GetMapping("/")
+    @GetMapping("")
     fun findAll(pageable: Pageable): Page<User> {
         return service.findAll(pageable).also {
             page -> logger.info("[findAll($pageable)] => $page")
@@ -37,7 +37,7 @@ class UserController(private val service: UserService) {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody userRequest: User, resp: HttpServletResponse): ResponseEntity<Unit> {
         service.save(userRequest).also {

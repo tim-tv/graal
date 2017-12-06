@@ -45,3 +45,11 @@ services:
       options:
         max-size: "10m"
         max-file: "10"
+
+  aggregation-service:
+    image: titart/aggregation-service
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"

@@ -18,7 +18,7 @@ class HashTagController(private val service: HashTagService) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    @GetMapping("/")
+    @GetMapping("")
     fun findAll(pageable: Pageable): Page<HashTag> {
         return service.findAll(pageable).also {
             page -> logger.info("[findAll($pageable)] => $page")
@@ -37,7 +37,7 @@ class HashTagController(private val service: HashTagService) {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody tagRequest: HashTag, resp: HttpServletResponse): ResponseEntity<Unit> {
         service.save(tagRequest).also {

@@ -27,7 +27,7 @@ class PostController(private val service: PostService, private val validator: Po
         binder.addValidators(validator)
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     fun findAll(pageable: Pageable): Page<Post> {
         return service.findAll(pageable).also {
             page -> logger.info("[findAll($pageable)] => $page")
@@ -39,14 +39,14 @@ class PostController(private val service: PostService, private val validator: Po
         return service.findById(id).also { post -> logger.info("[findById($id)] => $post") }
     }
 
-    @GetMapping("/search")
+    @GetMapping("/find")
     fun findByUserId(@RequestParam("user_id") userId: Long, pageable: Pageable): Page<Post> {
         return service.findByUserId(userId, pageable).also {
-            logger.info("[findByUserId($userId) => $it")
+            logger.info("[findByUserId($userId)] => $it")
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@Valid @RequestBody postRequest: Post,
                resp: HttpServletResponse): ResponseEntity<Unit>
