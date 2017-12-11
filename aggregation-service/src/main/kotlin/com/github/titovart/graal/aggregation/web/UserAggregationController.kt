@@ -3,6 +3,7 @@ package com.github.titovart.graal.aggregation.web
 import com.github.titovart.graal.aggregation.client.PostClient
 import com.github.titovart.graal.aggregation.client.TagClient
 import com.github.titovart.graal.aggregation.client.UserClient
+import com.github.titovart.graal.aggregation.entity.MessageResponseEntity
 import com.github.titovart.graal.aggregation.entity.post.PostFeignRequest
 import com.github.titovart.graal.aggregation.entity.post.PostFeignResponse
 import com.github.titovart.graal.aggregation.entity.post.PostRequest
@@ -17,28 +18,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.server.ServerErrorException
 import javax.naming.ServiceUnavailableException
 import javax.persistence.EntityNotFoundException
 import javax.servlet.http.HttpServletResponse
-
-
-class MessageResponseEntity<T>(
-        status: HttpStatus,
-        body: T? = null,
-        headers: MultiValueMap<String, String>? = null,
-        val message: String? = null) : ResponseEntity<T>(body, headers, status) {
-
-    companion object {
-        fun <T> fromResp(resp: ResponseEntity<T>): MessageResponseEntity<T> {
-            return MessageResponseEntity(resp.statusCode, resp.body, resp.headers)
-        }
-    }
-
-}
 
 
 @RestController
