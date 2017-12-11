@@ -30,7 +30,7 @@ class UserController(private val service: UserService) {
         return service.findById(id).also { user -> logger.info("[findById($id)] => $user") }
     }
 
-    @GetMapping("/search")
+    @GetMapping("/find")
     fun findByUserName(@RequestParam("username") username: String): User {
         return service.findByUserName(username).also {
             user -> logger.info("[findByUserName($username)] => $user")
@@ -49,7 +49,7 @@ class UserController(private val service: UserService) {
         return ResponseEntity(HttpStatus.CREATED)
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody userRequest: User): ResponseEntity<User> {
         val updatedUser = service.update(id, userRequest).also {
             user -> logger.info("[update($userRequest) => updated $user")
