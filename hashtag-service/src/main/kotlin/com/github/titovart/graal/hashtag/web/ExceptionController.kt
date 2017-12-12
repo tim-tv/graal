@@ -34,7 +34,8 @@ class ExceptionController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception::class)
     fun handleInternalServerError(exc: Exception): ErrorResponse {
-        logger.info("[500] => ${exc.message}")
+        logger.error("[500] => ${exc.message}")
+        logger.error("[500] => ", exc)
         return ErrorResponse(exc.message ?: "unknown error")
     }
 

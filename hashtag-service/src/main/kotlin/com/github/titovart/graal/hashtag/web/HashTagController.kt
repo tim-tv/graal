@@ -30,7 +30,7 @@ class HashTagController(private val service: HashTagService) {
         return service.findById(id).also { tag -> logger.info("[findById($id)] => $tag") }
     }
 
-    @GetMapping("/search")
+    @GetMapping("/find")
     fun findByValue(@RequestParam("value") value: String): HashTag {
         return service.findByValue(value).also {
             tag -> logger.info("[findByValue($value)] => $tag")
