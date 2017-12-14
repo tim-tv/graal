@@ -2,26 +2,34 @@ package com.github.titovart.graal.hashtag.web
 
 import com.github.titovart.graal.hashtag.model.HashTag
 import com.github.titovart.graal.hashtag.service.HashTagService
+import com.github.titovart.graal.hashtag.validation.HashTagValidator
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
+import javax.validation.Valid
 
 
 @RestController
 @RequestMapping("/hashtags")
-class HashTagController(private val service: HashTagService) {
+class HashTagController(private val service: HashTagService, private val validator: HashTagValidator) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
+    @InitBinder
+    fun setupBinder(binder: WebDataBinder) {
+        binder.addValidators(validator)
+    }
+
     @GetMapping("")
     fun findAll(pageable: Pageable): Page<HashTag> {
-        return service.findAll(pageable).also {
-            page -> logger.info("[findAll($pageable)] => $page")
+        return service.findAll(pageable).also { page ->
+            logger.info("[findAll($pageable)] => $page")
         }
     }
 
@@ -32,26 +40,27 @@ class HashTagController(private val service: HashTagService) {
 
     @GetMapping("/find")
     fun findByValue(@RequestParam("value") value: String): HashTag {
-        return service.findByValue(value).also {
-            tag -> logger.info("[findByValue($value)] => $tag")
+        return service.findByValue(value).also { tag ->
+            logger.info("[findByValue($value)] => $tag")
         }
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody tagRequest: HashTag, resp: HttpServletResponse): ResponseEntity<Unit> {
-        service.save(tagRequest).also {
-            tag ->
-                resp.addHeader(HttpHeaders.LOCATION, "/hashtags/${tag.id}")
-                logger.info("[create($tagRequest)] => created $tag")
+    fun create(@RequestBody @Valid tagRequest: HashTag, resp: HttpServletResponse): ResponseEntity<Unit> {
+        service.save(tagRequest).also { tag ->
+            resp.addHeader(HttpHeaders.LOCATION, "/hashtags/${tag.id}")
+            logger.info("[create($tagRequest)] => created $tag")
         }
 
         return ResponseEntity(HttpStatus.CREATED)
     }
-    
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long): ResponseEntity<Unit> {
+        service.findById(id)
+
         service.delete(id).also { logger.info("[delete($id)] => deleted") }
         return ResponseEntity.noContent().build()
     }

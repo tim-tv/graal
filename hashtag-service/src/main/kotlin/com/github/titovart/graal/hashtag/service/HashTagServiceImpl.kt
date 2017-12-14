@@ -2,7 +2,6 @@ package com.github.titovart.graal.hashtag.service
 
 import com.github.titovart.graal.hashtag.model.HashTag
 import com.github.titovart.graal.hashtag.repository.HashTagRepository
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -37,16 +36,12 @@ class HashTagServiceImpl(private val repository: HashTagRepository) : HashTagSer
             throw EntityExistsException("HashTag #${hashTag.value} already exists.")
         }
 
-        return repository.save(hashTag)
+        return repository.save(HashTag(value = hashTag.value))
     }
 
     @Transactional
     override fun delete(id: Long) {
-        try {
-            repository.deleteById(id)
-        } catch (exc: EmptyResultDataAccessException) {
-            throw EntityNotFoundException("HashTag(id=$id) doesn't exists.")
-        }
+        repository.deleteById(id)
     }
 
 }
