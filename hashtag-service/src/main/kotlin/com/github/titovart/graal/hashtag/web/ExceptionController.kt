@@ -68,9 +68,7 @@ class ExceptionController {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(exc: MethodArgumentNotValidException): ErrorResponse {
         logger.info("[400] => ${exc.bindingResult}")
-
-        val msg = exc.bindingResult.allErrors.fold("") { res, err -> res + "${err.code}. " }
-        return ErrorResponse(msg)
+        return ErrorResponse(exc.bindingResult.fieldError.defaultMessage)
     }
 
 }

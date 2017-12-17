@@ -2,14 +2,12 @@ package com.github.titovart.graal.hashtag.web
 
 import com.github.titovart.graal.hashtag.model.HashTag
 import com.github.titovart.graal.hashtag.service.HashTagService
-import com.github.titovart.graal.hashtag.validation.HashTagValidator
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
@@ -17,14 +15,9 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/hashtags")
-class HashTagController(private val service: HashTagService, private val validator: HashTagValidator) {
+class HashTagController(private val service: HashTagService) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
-
-    @InitBinder
-    fun setupBinder(binder: WebDataBinder) {
-        binder.addValidators(validator)
-    }
 
     @GetMapping("")
     fun findAll(pageable: Pageable): Page<HashTag> {

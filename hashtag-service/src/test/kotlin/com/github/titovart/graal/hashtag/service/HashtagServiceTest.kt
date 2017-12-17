@@ -10,6 +10,7 @@ import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.dao.NonTransientDataAccessException
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -108,8 +109,8 @@ class HashtagServiceTest {
         tagService.delete(1L)
     }
 
-    @Test(expected = EntityNotFoundException::class)
-    fun throwEntityNotFoundExceptionWhenDeleteByInvalidId() {
+    @Test(expected = NonTransientDataAccessException::class)
+    fun throwExceptionWhenDeleteByInvalidId() {
         Mockito.`when`(repository.deleteById(anyLong())).thenAnswer({
             val id = it.arguments[0] as Long
             if (id != 1L) {

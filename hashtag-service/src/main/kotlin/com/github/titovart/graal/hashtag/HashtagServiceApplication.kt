@@ -17,12 +17,8 @@ class HashtagServiceApplication {
 
     @Bean
     fun init(service: HashTagService) = CommandLineRunner {
-        service.save(HashTag("дочкисыночки"))
-        service.save(HashTag("молодаямама"))
-        service.save(HashTag("инстамама"))
-        service.save(HashTag("маминарадость"))
-        service.save(HashTag("сыночка"))
-        service.save(HashTag("инстадочка"))
+        service.save(HashTag("like4like"))
+        service.save(HashTag("insta_mom"))
 
         logger.info("Hash tag micro-service has started")
     }
