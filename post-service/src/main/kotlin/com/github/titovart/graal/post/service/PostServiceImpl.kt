@@ -31,7 +31,7 @@ class PostServiceImpl(private val repository: PostRepository) : PostService {
 
     @Transactional
     override fun save(post: Post): Post {
-        return repository.save(post)
+        return repository.save(post.safeCopy())
     }
 
     @Transactional
@@ -52,4 +52,18 @@ class PostServiceImpl(private val repository: PostRepository) : PostService {
     override fun delete(postId: Long) {
         return repository.deleteById(postId)
     }
+
+    /**
+     * Creates a copy of the given post using only
+     * <code>content, caption, userId and tags</code> fields.
+     *
+     * @param post the post to copy
+     * @return a safety copy of the given post
+     */
+    private fun Post.safeCopy() = Post(
+            content = this.content,
+            caption = this.caption,
+            userId = this.userId,
+            tags = this.tags
+    )
 }

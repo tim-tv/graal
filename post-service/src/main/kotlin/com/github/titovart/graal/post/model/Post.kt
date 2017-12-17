@@ -3,24 +3,33 @@ package com.github.titovart.graal.post.model
 
 import java.util.Date
 import javax.persistence.*
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Positive
+import javax.validation.constraints.Size
 
 
 @Entity
 data class Post(
 
-        @Column(length = CONTENT_LEN)
+        @Column(length = 500)
+        @field:NotNull
+        @field:Size(min = 1, max = 500, message = "Content size must be in range [1, 500].")
         var content: String,
 
-        @Column(length = CAPTION_LEN)
+        @Column(length = 200)
+        @field:Size(min = 1, max = 200, message = "Caption size bust be in range [1, 200].")
         var caption: String?,
 
-        var userId: Long,
+        @field:NotNull
+        @field:Positive(message = "User's id must be positive.")
+        val userId: Long,
 
         @ElementCollection
         @CollectionTable(name = "tags")
+        @field:Size(max = 50, message = "Number of hashtags must be not more than 50.")
         var tags: MutableSet<Long> = mutableSetOf(),
 
-        @Column(insertable = false, updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+        @Column(insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
         @Temporal(TemporalType.TIMESTAMP)
         val createdDateTime: Date = Date(),
 
@@ -30,12 +39,4 @@ data class Post(
 
         @Id @GeneratedValue(strategy = GenerationType.AUTO)
         val id: Long = -1
-) {
-    companion object {
-        /** The max value of content length for posts checked by the database. */
-        const val CONTENT_LEN = 500
-
-        /** The max value of caption length for posts checked by the database. */
-        const val CAPTION_LEN = 200
-    }
-}
+)

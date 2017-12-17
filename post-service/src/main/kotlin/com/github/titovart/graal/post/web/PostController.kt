@@ -3,14 +3,12 @@ package com.github.titovart.graal.post.web
 import com.github.titovart.graal.post.model.Post
 import com.github.titovart.graal.post.model.PostRequest
 import com.github.titovart.graal.post.service.PostService
-import com.github.titovart.graal.post.validation.PostValidator
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
@@ -18,14 +16,9 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/posts")
-class PostController(private val service: PostService, private val validator: PostValidator) {
+class PostController(private val service: PostService) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
-
-    @InitBinder
-    fun setupBiner(binder: WebDataBinder) {
-        binder.addValidators(validator)
-    }
 
     @GetMapping("")
     fun findAll(pageable: Pageable): Page<Post> {
@@ -74,6 +67,8 @@ class PostController(private val service: PostService, private val validator: Po
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long): ResponseEntity<Unit> {
+        service.findById(id)
+
         service.delete(id).also { logger.info("[delete($id)] => deleted") }
         return ResponseEntity.noContent().build()
     }
