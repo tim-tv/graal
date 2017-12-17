@@ -16,7 +16,7 @@ class UserServiceApplication {
     fun init(service: UserService) = CommandLineRunner {
         service.save(User("titart", "titart@gmail.com"))
         service.save(User("murmur", "murmur@gmail.com"))
-        service.save(User("mr.robot", "mr.robot@gmail.com"))
+        service.save(User("mr_robot", "mr.robot@gmail.com"))
     }
 
     companion object {

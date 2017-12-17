@@ -1,9 +1,8 @@
-package com.github.titovart.graal.user.controller
+package com.github.titovart.graal.user.web
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.titovart.graal.user.model.User
 import com.github.titovart.graal.user.service.UserService
-import com.github.titovart.graal.user.web.UserController
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyLong
@@ -63,7 +62,7 @@ class UserControllerTest {
 
 
     @Test(expected = NestedServletException::class)
-    fun throwExceptionWhenUserWithGivenIdNotFound() {
+    fun shouldThrowExceptionWhenUserWithGivenIdNotFound() {
         Mockito.`when`(userService.findById(anyLong())).thenThrow(EntityNotFoundException())
         mockMvc.perform(get("/users/{id}", 122L))
     }
@@ -82,7 +81,7 @@ class UserControllerTest {
     }
 
     @Test(expected = EntityNotFoundException::class)
-    fun throwExceptionWhenUserWithGiveNameNotFound() {
+    fun shouldThrowExceptionWhenUserWithGiveNameNotFound() {
         val user = User("jane", "jane@bmstu.ru", id = 1L)
         Mockito.`when`(userService.findByUserName(anyString())).thenThrow(EntityNotFoundException())
         Mockito.`when`(userService.findByUserName("jane")).thenReturn(user)
@@ -101,7 +100,7 @@ class UserControllerTest {
         val user = User("jane", "jane@bmstu.ru", id = 1L)
         val json = mapper.writeValueAsString(user)
 
-
+        Mockito.`when`(userService.findByUserName(anyString())).thenThrow(EntityNotFoundException())
         Mockito.`when`(userService.save(user)).thenReturn(user)
 
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(json))

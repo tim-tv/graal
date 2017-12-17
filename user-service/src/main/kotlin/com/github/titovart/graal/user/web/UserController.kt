@@ -9,7 +9,10 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.persistence.EntityExistsException
+import javax.persistence.EntityNotFoundException
 import javax.servlet.http.HttpServletResponse
+import javax.validation.Valid
 
 
 @RestController
@@ -39,7 +42,16 @@ class UserController(private val service: UserService) {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody userRequest: User, resp: HttpServletResponse): ResponseEntity<Unit> {
+    fun create(@RequestBody @Valid userRequest: User, resp: HttpServletResponse): ResponseEntity<Unit> {
+
+        try {
+            findByUserName(userRequest.nickName).let {
+                throw EntityExistsException("User with this nickname already exists.")
+            }
+        } catch (exc: EntityNotFoundException) {
+            // just check that creating entity is unique so do nothing here
+        }
+
         service.save(userRequest).also {
             user ->
                 resp.addHeader(HttpHeaders.LOCATION, "/users/${user.id}")

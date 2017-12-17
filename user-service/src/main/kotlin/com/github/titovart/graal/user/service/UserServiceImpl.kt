@@ -30,7 +30,7 @@ class UserServiceImpl(private val repository: UserRepository) : UserService {
 
     @Transactional
     override fun save(user: User): User {
-        return repository.save(user)
+        return repository.save(User(nickName = user.nickName, email = user.email))
     }
 
     @Transactional
