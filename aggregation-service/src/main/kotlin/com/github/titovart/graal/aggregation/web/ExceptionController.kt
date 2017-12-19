@@ -1,14 +1,22 @@
 package com.github.titovart.graal.aggregation.web
 
+import com.github.titovart.graal.aggregation.entity.ErrorResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.server.ServerErrorException
 import javax.naming.ServiceUnavailableException
-import javax.persistence.EntityExistsException
-import javax.persistence.EntityNotFoundException
+import javax.servlet.http.HttpServletRequest
 
 
 @RestControllerAdvice(annotations = arrayOf(RestController::class))
@@ -16,20 +24,50 @@ class ExceptionController {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    data class ErrorResponse(val message: String)
+    @ExceptionHandler(HttpServerErrorException::class)
+    private fun handleServerErrorException(
+            req: HttpServletRequest,
+            exc: HttpServerErrorException): ResponseEntity<ErrorResponse> {
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(EntityNotFoundException::class)
-    fun handleNotFoundException(exc: EntityNotFoundException): ErrorResponse {
-        logger.error("[404] => ${exc.message}")
-        return ErrorResponse(exc.message ?: "entity not found")
+        logger.info("[${exc.statusCode}] => ", exc)
+        return ResponseEntity(ErrorResponse(exc.responseBodyAsString), exc.statusCode)
     }
 
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(EntityExistsException::class)
-    fun handleEntityExistsException(exc: EntityExistsException): ErrorResponse {
-        logger.error("[409] => ${exc.message}")
-        return ErrorResponse(exc.message ?: "unknown error")
+    @ExceptionHandler(HttpClientErrorException::class)
+    private fun handleClientErrorException(
+            req: HttpServletRequest,
+            exc: HttpClientErrorException): ResponseEntity<ErrorResponse> {
+
+        logger.info("[${exc.statusCode}] => ", exc)
+        return ResponseEntity(ErrorResponse(exc.responseBodyAsString), exc.statusCode)
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestParameterException::class)
+    fun handleRequestParamException(exc: MissingServletRequestParameterException): ErrorResponse {
+        logger.info("[400] => ${exc.message}")
+        return ErrorResponse(exc.message ?: "Missing request parameter.")
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleMallformedJsonError(exc: HttpMessageNotReadableException): ErrorResponse {
+        logger.info("[400] => ${exc.message}")
+        return ErrorResponse("Malformed JSON. Please check request body and try again.")
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    fun handleMethodArgumentTypeException(exc: MethodArgumentTypeMismatchException): ErrorResponse {
+        logger.info("[400] => ${exc.message}")
+        return ErrorResponse("Invalid method argument type.")
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(exc: MethodArgumentNotValidException): ErrorResponse {
+        logger.info("[400] => ${exc.bindingResult}")
+        return ErrorResponse(exc.bindingResult.fieldError.defaultMessage)
     }
 
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
@@ -37,14 +75,20 @@ class ExceptionController {
     fun handleServiceUnavailableException(exc: ServiceUnavailableException): ErrorResponse {
         logger.error("[503] => ${exc.message}")
         return ErrorResponse("This request is unreachable because one " +
-                "or more services are unavailable now. Please try later")
+                "or more services are unavailable now. Please try later.")
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ServerErrorException::class)
+    fun handleServerErrorException(exc: ServerErrorException): ErrorResponse {
+        logger.error("[500] => ", exc)
+        return ErrorResponse("Internal service error. Please try later.")
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception::class)
     fun handleInternalServerError(exc: Exception): ErrorResponse {
-        logger.error("[500] => Message: ${exc.message}")
-        logger.error("[500] => Throwable: ", exc)
+        logger.error("[500] => ", exc)
         return ErrorResponse("Internal service error. Please try later.")
     }
 

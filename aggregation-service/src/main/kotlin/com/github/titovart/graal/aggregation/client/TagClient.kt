@@ -14,7 +14,7 @@ interface TagClient {
     @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/hashtags/{id}")
     fun getById(@PathVariable("id") id: Long): ResponseEntity<Tag>
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/hashtags/search")
+    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/hashtags/find")
     fun getByValue(@RequestParam("value") value: String): ResponseEntity<Tag>
 
     @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/hashtags")
