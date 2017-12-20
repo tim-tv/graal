@@ -52,9 +52,9 @@ class HashTagController(private val service: HashTagService) {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long): ResponseEntity<Unit> {
-        service.findById(id)
+        val tag = service.findById(id)
 
-        service.delete(id).also { logger.info("[delete($id)] => deleted") }
+        service.delete(id).also { logger.info("[delete($id)] => deleted $tag") }
         return ResponseEntity.noContent().build()
     }
 }

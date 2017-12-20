@@ -9,7 +9,6 @@ import com.github.titovart.graal.aggregation.entity.post.PostPartialResponse
 import com.github.titovart.graal.aggregation.entity.post.PostRequest
 import com.github.titovart.graal.aggregation.entity.post.PostResponse
 import com.github.titovart.graal.aggregation.entity.tag.Tag
-import com.github.titovart.graal.aggregation.entity.user.UserResponse
 import com.netflix.client.ClientException
 import feign.RetryableException
 import org.slf4j.LoggerFactory
@@ -46,13 +45,26 @@ class UserAggregationController(
         val user = clientSafeGetExec { userClient.getById(userId) }
         logger.info("[createPost($userId)] => received User(id=$userId)")
 
-        val tags = postRequest.tags.map { getOrCreateTag(it).id }.toSet()
-        logger.info("[createPost($userId)] => all tags received")
+        logger.info("[createPost($userId)] => getting tags")
+        val rollbackResp = createOrGetTags(postRequest.tags)
+        rollbackResp.exc?.let {
+            logger.info("[createPost($userId)] => rollback tags after ${rollbackResp.exc}")
+            rollbackTags(rollbackResp.newValues.toSet())
+            throw rollbackResp.exc
+        }
+        val tags = rollbackResp.values.map { it.id }.toSet()
 
         val postFeignRequest =
                 PostFeignRequest(postRequest.content, postRequest.caption, user.id, tags)
 
-        val postResp = safeExec({ postClient.create(postFeignRequest) }, HttpStatus.CREATED)
+        logger.info("[createPost($userId)] => creating a new post")
+        val postResp = try {
+            safeExec({ postClient.create(postFeignRequest) }, HttpStatus.CREATED)
+        } catch (exc: Exception) {
+            logger.info("[createPost($userId)] => rollback tags after $exc")
+            rollbackTags(rollbackResp.newValues.toSet())
+            throw exc
+        }
 
         val locationHeader = postResp.headers.getFirst(HttpHeaders.LOCATION)
         resp.addHeader(HttpHeaders.LOCATION, "/aggr/$locationHeader")
@@ -96,7 +108,7 @@ class UserAggregationController(
         val user = clientSafeGetExec { userClient.getById(userId) }
         logger.info("[updatePost($postId)] => received User(id=$userId)")
 
-        val tags = postRequest.tags.map { getOrCreateTag(it).id }.toSet()
+        val tags = postRequest.tags.map { getOrCreateTag(it).body.id }.toSet()
         logger.info("[updatePost($postId)] => all tags have received")
 
         val postFeignRequest =
@@ -153,48 +165,51 @@ class UserAggregationController(
         return PageImpl<Tag>(data, pageable, tags.size.toLong())
     }
 
-    private fun getUser(userId: Long): UserResponse? {
-        val userResp = exec({ userClient.getById(userId) }, HttpStatus.NOT_FOUND)
-        return when (userResp.statusCode) {
-            HttpStatus.OK -> userResp.body ?:
-                    throw ServerErrorException("Body of response for User(id=$userId) is null.")
-            HttpStatus.NOT_FOUND -> null
-            else -> throw ServerErrorException("Error while getting User(id=$userId). " +
-                    "Http status: ${userResp.statusCode}.")
+    private fun rollbackTags(tags: Set<Tag>) {
+        tags.map { tag ->
+            logger.info("[rollbackTags] => deleting $tag")
+            safeExec({ tagClient.delete(tag.id) }, HttpStatus.NO_CONTENT)
         }
     }
 
-    private fun getTagByValue(value: String): Tag? {
-        val tagResp = exec({ tagClient.getByValue(value) }, HttpStatus.NOT_FOUND)
-        return when (tagResp.statusCode) {
-            HttpStatus.OK -> tagResp.body
-            HttpStatus.NOT_FOUND -> null
-            else -> throw ServerErrorException("Invalid status code - ${tagResp.statusCode} " +
-                    "occurred while trying to retrieve tag #$value by value.")
-        }
-    }
+    private fun createOrGetTags(tagValues: Set<String>): RollbackResponse<Tag> {
+        val tags = mutableListOf<Tag>()
+        val newTags = mutableListOf<Tag>()
 
-    private fun getTagById(id: Long): Tag? {
-        val tagResp = exec({ tagClient.getById(id) }, HttpStatus.NOT_FOUND)
-        return when (tagResp.statusCode) {
-            HttpStatus.OK -> tagResp.body
-            HttpStatus.NOT_FOUND -> null
-            else -> throw ServerErrorException("Invalid status code - ${tagResp.statusCode} " +
-                    "occurred while trying to retrieve Tag(id=$id).")
-        }
-    }
+        tagValues.map { tagValue ->
+            logger.info("[createOrGetTags] => getting tag by value = $tagValue")
 
-    private fun getOrCreateTag(value: String): Tag {
-        return getTagByValue(value) ?: let {
-            val tagResp = exec { tagClient.create(Tag(value = value)) }
-            if (tagResp.statusCode != HttpStatus.CREATED) {
-                throw ServerErrorException("Couldn't create a new tag #$value. " +
-                        "Http status: ${tagResp.statusCode}.")
+            val tagProxy = try {
+                getOrCreateTag(tagValue)
+            } catch (exc: ServiceUnavailableException) {
+                // rethrow exception because if service is unavailable it can't do rollback
+                throw exc
+            } catch (exc: HttpClientErrorException) {
+                return RollbackResponse(tags, newTags, exc)
             }
 
-            return getTagByValue(value) ?:
-                    throw ServerErrorException("Couldn't get tag #$value after creating.")
+            tags += tagProxy.body
+            if (tagProxy.isNew) {
+                newTags += tagProxy.body
+            }
         }
+
+        return RollbackResponse(tags, newTags)
+    }
+
+
+    private fun getOrCreateTag(tagValue: String): TagProxy {
+        val tagResp = exec({ tagClient.getByValue(tagValue) }, HttpStatus.NOT_FOUND)
+        if (tagResp.statusCode == HttpStatus.OK) {
+            val tag = tagResp.body ?: throw ServerErrorException("Response body is null")
+            return TagProxy(tag, false)
+        }
+
+        val newTagResp = clientSafeExec({ tagClient.create(Tag(value = tagValue)) }, HttpStatus.CREATED)
+        val locationHeader = newTagResp.headers.getFirst(HttpHeaders.LOCATION)
+                ?: throw ServerErrorException("Invalid location header")
+        val id = locationHeader.split('/').last().toLong()
+        return TagProxy(Tag(id, tagValue), true)
     }
 
     private fun <T> exec(body: () -> T): T {
@@ -230,7 +245,7 @@ class UserAggregationController(
             body: () -> ResponseEntity<T>,
             validStatus: HttpStatus = HttpStatus.OK): ResponseEntity<T> {
 
-        val resp = exec(body)
+        val resp = exec { body() }
         return resp.takeIf { it.statusCode == validStatus } ?:
                 throw ServerErrorException("Expected status $validStatus, but got ${resp.statusCode}.")
     }
@@ -258,4 +273,13 @@ class UserAggregationController(
         }
     }
 
+    companion object {
+        data class RollbackResponse<T>(
+                val values: List<T>,
+                val newValues: List<T>,
+                val exc: Throwable? = null
+        )
+
+        data class TagProxy(val body: Tag, val isNew: Boolean)
+    }
 }

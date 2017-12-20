@@ -19,4 +19,8 @@ interface TagClient {
 
     @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/hashtags")
     fun create(tagRequest: Tag): ResponseEntity<Unit>
+
+    @RequestMapping(method = arrayOf(RequestMethod.DELETE), value = "/hashtags/{id}")
+    fun delete(@PathVariable("id") id: Long): ResponseEntity<Unit>
+
 }
