@@ -38,7 +38,7 @@ class ExceptionController {
             req: HttpServletRequest,
             exc: HttpClientErrorException): ResponseEntity<ErrorResponse> {
 
-        logger.info("[${exc.statusCode}] => ", exc)
+        logger.info("[${exc.statusCode}] => Status: ${exc.statusCode}, Message: ${exc.message}")
         return ResponseEntity(ErrorResponse(exc.responseBodyAsString), exc.statusCode)
     }
 

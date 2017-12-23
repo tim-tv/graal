@@ -22,6 +22,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.server.ServerErrorException
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import javax.annotation.PostConstruct
 import javax.naming.ServiceUnavailableException
 import javax.servlet.http.HttpServletResponse
 
@@ -35,6 +40,35 @@ class UserAggregationController(
 ) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
+
+    private final lateinit var taskQueue: BlockingQueue<RecoveryTask>
+
+    private final lateinit var taskExecutorService: ExecutorService
+
+    @PostConstruct
+    fun initExecutors() {
+        taskQueue = ArrayBlockingQueue(MAX_TASK_QUEUE_SIZE)
+        taskExecutorService = Executors.newSingleThreadExecutor()
+
+        // detached thread for processing tasks from queue (see #updatePost)
+        taskExecutorService.submit {
+            while (true) {
+                val task = taskQueue.take()
+                logger.info("[executor]:queue[${taskQueue.size}] => " +
+                        "Url: ${task.url}, Description: ${task.description}")
+
+                try {
+                    task.body()
+                } catch (exc: ServiceUnavailableException) {
+                    logger.info("[executor] => service is still unavailable: $exc")
+                    taskQueue.put(task)
+                    Thread.sleep(POOLING_UNAVAILABLE_TIMEOUT) // set timeout if the service is unavailable
+                } catch (exc: Exception) {
+                    logger.info("[executor] => errors $exc")
+                }
+            }
+        }
+    }
 
     @PostMapping("/users/{userId}/posts")
     @ResponseStatus(HttpStatus.CREATED)
@@ -67,7 +101,7 @@ class UserAggregationController(
         }
 
         val locationHeader = postResp.headers.getFirst(HttpHeaders.LOCATION)
-        resp.addHeader(HttpHeaders.LOCATION, "/aggr/$locationHeader")
+        resp.addHeader(HttpHeaders.LOCATION, locationHeader)
 
         logger.info("[createPost($userId)] => a new post has been created: $locationHeader")
 
@@ -102,20 +136,55 @@ class UserAggregationController(
     @ResponseStatus(HttpStatus.OK)
     fun updatePost(@PathVariable userId: Long,
                    @PathVariable postId: Long,
-                   @RequestBody postRequest: PostRequest,
-                   resp: HttpServletResponse): ResponseEntity<Any> {
+                   @RequestBody postRequest: PostRequest): ResponseEntity<Any> {
 
         val user = clientSafeGetExec { userClient.getById(userId) }
         logger.info("[updatePost($postId)] => received User(id=$userId)")
 
-        val tags = postRequest.tags.map { getOrCreateTag(it).body.id }.toSet()
-        logger.info("[updatePost($postId)] => all tags have received")
+        val getTagsFunc = {
+            val tags = postRequest.tags.map { getOrCreateTag(it).body.id }.toSet()
+            logger.info("[updatePost($postId)] => all tags have received")
+            tags
+        }
 
-        val postFeignRequest =
-                PostFeignRequest(postRequest.content, postRequest.caption, user.id, tags)
+        val updateTagsFunc = { tags: Set<Long> ->
 
-        clientSafeExec({ postClient.update(postId, postFeignRequest) })
-        logger.info("[updatePost($postId)] => the post has been updated")
+            val postFeignRequest =
+                    PostFeignRequest(postRequest.content, postRequest.caption, user.id, tags)
+
+            clientSafeExec({ postClient.update(postId, postFeignRequest) })
+            logger.info("[updatePost($postId)] => the post has been updated")
+        }
+
+        val fullUpdateFunc = {
+            val tags = getTagsFunc()
+            updateTagsFunc(tags)
+        }
+
+        val url = "/users/$userId/posts/$postId"
+        val tags = try {
+            getTagsFunc()
+        } catch (exc: ServiceUnavailableException) {
+            logger.info("[updatePost($postId)] => scheduling task because of: $exc")
+            val state = taskQueue.offer(RecoveryTask(url, "[updatePost] => can't get tags", { fullUpdateFunc() }))
+            if (!state) {
+                logger.info("[updatePost($postId)] => couldn't schedule task because queue is full")
+                throw exc
+            }
+            return ResponseEntity(HttpStatus.OK)
+        }
+
+        try {
+            updateTagsFunc(tags)
+        } catch (exc: ServiceUnavailableException) {
+            logger.info("[updatePost($postId)] => schedule task because of: $exc")
+            val state = taskQueue.offer(RecoveryTask(url, "[updatePost] => can't get tags", { fullUpdateFunc() }))
+            if (!state) {
+                logger.info("[updatePost($postId)] => couldn't schedule task because queue is full")
+                throw exc
+            }
+            return ResponseEntity(HttpStatus.OK)
+        }
 
         return ResponseEntity(HttpStatus.OK)
     }
@@ -196,7 +265,6 @@ class UserAggregationController(
 
         return RollbackResponse(tags, newTags)
     }
-
 
     private fun getOrCreateTag(tagValue: String): TagProxy {
         val tagResp = exec({ tagClient.getByValue(tagValue) }, HttpStatus.NOT_FOUND)
@@ -281,5 +349,11 @@ class UserAggregationController(
         )
 
         data class TagProxy(val body: Tag, val isNew: Boolean)
+
+        data class RecoveryTask(val url: String, val description: String, val body: () -> Unit)
+
+        const val MAX_TASK_QUEUE_SIZE = 1000
+
+        const val POOLING_UNAVAILABLE_TIMEOUT = 10000L
     }
 }

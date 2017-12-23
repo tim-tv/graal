@@ -40,7 +40,7 @@ targetCompatibility = 1.8
 mainClassName = "com.github.titovart.graal.aggregation.AggregationServiceApplication"
 
 jar {
-    baseName = "hashtag-service"
+    baseName = "aggregation-service"
     group = project.group
     version = project.version
     manifest {
