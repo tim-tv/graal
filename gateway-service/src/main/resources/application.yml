@@ -17,8 +17,7 @@ zuul:
   routes:
     user-aggr-service:
       path: /**
-      serviceId: aggregation-service
-      stripPrefix: false
+      url: http://aggregation-service:8884/aggr
 
 hystrix:
   command:
