@@ -9,4 +9,6 @@ import org.springframework.data.repository.PagingAndSortingRepository
 interface PostRepository : PagingAndSortingRepository<Post, Long> {
 
     fun findByUserId(userId: Long, pageable: Pageable): Page<Post>
+
+    fun findByUserIdOrderByIdDesc(userId: Long, pageable: Pageable): Page<Post>
 }
