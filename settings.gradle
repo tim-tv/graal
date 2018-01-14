@@ -5,4 +5,4 @@ include 'post-service'
 include 'aggregation-service'
 include 'gateway-service'
 include 'eureka-service'
-
+include 'auth-service'
