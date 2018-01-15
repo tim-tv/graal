@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -40,6 +41,20 @@ class ExceptionController {
 
         logger.info("[${exc.statusCode}] => Status: ${exc.statusCode}, Message: ${exc.message}")
         return ResponseEntity(ErrorResponse(exc.responseBodyAsString), exc.statusCode)
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
+    fun handleAuthenticationException(exc: HttpMediaTypeNotSupportedException): ErrorResponse {
+        logger.info("[400] => ${exc.message}")
+        return ErrorResponse(exc.message ?: "Invalid content type.")
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(AuthException::class)
+    fun handleAuthenticationException(exc: AuthException): ErrorResponse {
+        logger.info("[401] => ${exc.message}")
+        return ErrorResponse(exc.message ?: "Unauthorized.")
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -90,6 +105,10 @@ class ExceptionController {
     fun handleInternalServerError(exc: Exception): ErrorResponse {
         logger.error("[500] => ", exc)
         return ErrorResponse("Internal service error. Please try later.")
+    }
+
+    companion object {
+        class AuthException(msg: String) : RuntimeException(msg)
     }
 
 }

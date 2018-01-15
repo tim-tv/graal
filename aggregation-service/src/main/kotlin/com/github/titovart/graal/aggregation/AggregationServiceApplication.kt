@@ -12,7 +12,8 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients
 class AggregationServiceApplication {
 
     companion object {
-        @JvmStatic fun main(args: Array<String>) {
+        @JvmStatic
+        fun main(args: Array<String>) {
             SpringApplication.run(AggregationServiceApplication::class.java, *args)
         }
     }

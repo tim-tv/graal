@@ -4,6 +4,7 @@ import feign.FeignException.errorStatus
 import feign.Response
 import feign.codec.ErrorDecoder
 import org.apache.commons.io.IOUtils
+import org.codehaus.jettison.json.JSONException
 import org.codehaus.jettison.json.JSONObject
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -23,12 +24,19 @@ class FeignClientErrorDecoder : ErrorDecoder {
         val statusCode = HttpStatus.valueOf(response.status())
         val statusText = response.reason()
 
-        val responseBody: ByteArray
+        val obj: JSONObject
         try {
-            val obj = JSONObject(IOUtils.toString(response.body().asReader()))
-            responseBody = obj.getString("message").toByteArray()
-        } catch (e: IOException) {
-            throw RuntimeException("Failed to process response body.", e)
+            obj = JSONObject(IOUtils.toString(response.body().asReader()))
+        } catch (exc: IOException) {
+            throw RuntimeException("Failed to process response body.", exc)
+        }
+
+        val responseBody = try {
+            // get error message from client services
+            obj.getString("message").toByteArray()
+        } catch (exc: JSONException) {
+            // read error message from auth-service
+            obj.getString("error_description").toByteArray()
         }
 
         return when (response.status()) {

@@ -1,14 +1,17 @@
 package com.github.titovart.graal.aggregation.web
 
+import com.github.titovart.graal.aggregation.client.AuthClient
 import com.github.titovart.graal.aggregation.client.PostClient
 import com.github.titovart.graal.aggregation.client.TagClient
 import com.github.titovart.graal.aggregation.client.UserClient
+import com.github.titovart.graal.aggregation.entity.AuthResponse
 import com.github.titovart.graal.aggregation.entity.PartialResponse
 import com.github.titovart.graal.aggregation.entity.post.PostFeignRequest
 import com.github.titovart.graal.aggregation.entity.post.PostPartialResponse
 import com.github.titovart.graal.aggregation.entity.post.PostRequest
 import com.github.titovart.graal.aggregation.entity.post.PostResponse
 import com.github.titovart.graal.aggregation.entity.tag.Tag
+import com.github.titovart.graal.aggregation.web.ExceptionController.Companion.AuthException
 import com.netflix.client.ClientException
 import feign.RetryableException
 import org.slf4j.LoggerFactory
@@ -16,9 +19,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.server.ServerErrorException
@@ -36,7 +37,8 @@ import javax.servlet.http.HttpServletResponse
 class UserAggregationController(
         private val userClient: UserClient,
         private val postClient: PostClient,
-        private val tagClient: TagClient
+        private val tagClient: TagClient,
+        private val authClient: AuthClient
 ) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -74,10 +76,19 @@ class UserAggregationController(
     @ResponseStatus(HttpStatus.CREATED)
     fun createPost(@PathVariable userId: Long,
                    @RequestBody postRequest: PostRequest,
+                   @RequestHeader headers: HttpHeaders,
                    resp: HttpServletResponse): ResponseEntity<Any> {
+
+        logger.info("[createPost($userId)] => checking scope permissions")
+        val authResp = checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
 
         val user = clientSafeGetExec { userClient.getById(userId) }
         logger.info("[createPost($userId)] => received User(id=$userId)")
+
+        logger.info("[createPost($userId)] => checking user permissions")
+        if (authResp.principal.username != user.nickName) {
+            throw AuthException("This user hasn't permissions to call this method.")
+        }
 
         logger.info("[createPost($userId)] => getting tags")
         val rollbackResp = createOrGetTags(postRequest.tags)
@@ -110,7 +121,12 @@ class UserAggregationController(
 
     @GetMapping("/users/{userId}/posts")
     @ResponseStatus(HttpStatus.OK)
-    fun getAllPosts(@PathVariable userId: Long, pageable: Pageable): Page<PostResponse> {
+    fun getAllPosts(@PathVariable userId: Long,
+                    pageable: Pageable,
+                    @RequestHeader headers: HttpHeaders): Page<PostResponse> {
+
+        logger.info("[getAllPosts($userId)] => checking scope permissions")
+        checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
 
         logger.info("[getAllPosts($userId)] => getting user")
         val user = clientSafeGetExec { userClient.getById(userId) }
@@ -136,10 +152,20 @@ class UserAggregationController(
     @ResponseStatus(HttpStatus.OK)
     fun updatePost(@PathVariable userId: Long,
                    @PathVariable postId: Long,
-                   @RequestBody postRequest: PostRequest): ResponseEntity<Any> {
+                   @RequestBody postRequest: PostRequest,
+                   @RequestHeader headers: HttpHeaders): ResponseEntity<Any> {
+
+        logger.info("[updatePost($userId)] => checking scope permissions")
+        val authResp = checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
 
         val user = clientSafeGetExec { userClient.getById(userId) }
         logger.info("[updatePost($postId)] => received User(id=$userId)")
+
+
+        logger.info("[updatePost($userId)] => checking user permissions")
+        if (authResp.principal.username != user.nickName) {
+            throw AuthException("This user hasn't permissions to call this method.")
+        }
 
         val getTagsFunc = {
             val tags = postRequest.tags.map { getOrCreateTag(it).body.id }.toSet()
@@ -191,7 +217,10 @@ class UserAggregationController(
 
     @GetMapping("/posts/{postId}")
     @ResponseStatus(HttpStatus.OK)
-    fun getPostById(@PathVariable postId: Long): PartialResponse {
+    fun getPostById(@PathVariable postId: Long, @RequestHeader headers: HttpHeaders): PartialResponse {
+
+        logger.info("[getPostById($postId)] => checking permissions")
+        checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
 
         logger.info("[getPostById($postId)] => getting post by id = $postId")
         val post = clientSafeGetExec { postClient.getById(postId) }
@@ -216,7 +245,12 @@ class UserAggregationController(
 
     @GetMapping("/posts/{postId}/tags")
     @ResponseStatus(HttpStatus.OK)
-    fun getTagsByPost(@PathVariable postId: Long, pageable: Pageable): Page<Tag> {
+    fun getTagsByPost(@PathVariable postId: Long,
+                      @RequestHeader headers: HttpHeaders,
+                      pageable: Pageable): Page<Tag> {
+
+        logger.info("[getTagsByPost($postId)] => checking permissions")
+        checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
 
         logger.info("[getTagsByPost($postId)] => getting post by id = $postId")
         val post = clientSafeGetExec { postClient.getById(postId) }
@@ -339,6 +373,23 @@ class UserAggregationController(
         } catch (exc: HttpClientErrorException) {
             throw ServerErrorException("Status: ${exc.statusCode}, Message: ${exc.responseBodyAsString}")
         }
+    }
+
+    private fun checkPermissionsAndGetAuthResponse(headers: HttpHeaders, scopes: List<String>): AuthResponse {
+        val token = headers.getFirst(HttpHeaders.AUTHORIZATION) ?:
+                throw AuthException("Access token is not found.")
+
+        val resp = exec { authClient.me(token) }.body
+                ?: throw ServerErrorException("Response body is null.")
+
+        val isValidScope = scopes.any { resp.oauth2Request.scope.contains(it) }
+
+        if (!isValidScope) {
+            logger.error("OAUTH SCOPE: ${resp.oauth2Request.scope}, METHOD SCOPE: $scopes")
+            throw AuthException("Invalid permissions for this scope.")
+        }
+
+        return resp
     }
 
     companion object {
