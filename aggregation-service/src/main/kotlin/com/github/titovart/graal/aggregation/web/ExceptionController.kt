@@ -82,7 +82,8 @@ class ExceptionController {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(exc: MethodArgumentNotValidException): ErrorResponse {
         logger.info("[400] => ${exc.bindingResult}")
-        return ErrorResponse(exc.bindingResult.fieldError.defaultMessage)
+        return ErrorResponse(exc.bindingResult.fieldError?.defaultMessage
+                ?: "Invalid method arguments.")
     }
 
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
