@@ -26,6 +26,11 @@ services:
     ports:
       - 8883:8883
 
+  auth-service:
+    build: auth-service
+    ports:
+      - 8885:8885
+
   aggregation-service:
     build: aggregation-service
     ports:

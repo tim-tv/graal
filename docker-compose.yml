@@ -46,6 +46,14 @@ services:
         max-size: "10m"
         max-file: "10"
 
+  auth-service:
+    image: titart/auth-service
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
   aggregation-service:
     image: titart/aggregation-service
     restart: always
