@@ -125,8 +125,8 @@ class UserAggregationController(
                     pageable: Pageable,
                     @RequestHeader headers: HttpHeaders): Page<PostResponse> {
 
-        logger.info("[getAllPosts($userId)] => checking scope permissions")
-        checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
+//        logger.info("[getAllPosts($userId)] => checking scope permissions")
+//        checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
 
         logger.info("[getAllPosts($userId)] => getting user")
         val user = clientSafeGetExec { userClient.getById(userId) }

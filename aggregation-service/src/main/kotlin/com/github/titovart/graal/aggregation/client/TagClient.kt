@@ -1,5 +1,6 @@
 package com.github.titovart.graal.aggregation.client
 
+import com.github.titovart.graal.aggregation.client.secure.SecureClient
 import com.github.titovart.graal.aggregation.entity.tag.Tag
 import org.springframework.cloud.netflix.feign.FeignClient
 import org.springframework.http.ResponseEntity
@@ -8,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 
-@FeignClient(name = "hashtag-service", configuration = arrayOf(FeignClientContext::class))
-interface TagClient {
+@FeignClient(name = "hashtag-service")
+interface TagClient : SecureClient {
 
     @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/hashtags/{id}")
     fun getById(@PathVariable("id") id: Long): ResponseEntity<Tag>

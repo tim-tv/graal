@@ -1,5 +1,6 @@
 package com.github.titovart.graal.aggregation.client
 
+import com.github.titovart.graal.aggregation.client.secure.SecureClient
 import com.github.titovart.graal.aggregation.entity.post.PostFeignRequest
 import com.github.titovart.graal.aggregation.entity.post.PostFeignResponse
 import org.springframework.cloud.netflix.feign.FeignClient
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 
 
-@FeignClient(name = "post-service", configuration = arrayOf(FeignClientContext::class))
-interface PostClient {
+@FeignClient(name = "post-service")
+interface PostClient : SecureClient {
 
     @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/posts/{id}")
     fun getById(@PathVariable("id") id: Long): ResponseEntity<PostFeignResponse>
