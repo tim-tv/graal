@@ -6,3 +6,5 @@ include 'aggregation-service'
 include 'gateway-service'
 include 'eureka-service'
 include 'auth-service'
+include 'spring-secure-services'
+
