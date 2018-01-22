@@ -2,7 +2,6 @@ package com.github.titovart.spring.service.secure.server
 
 import com.github.titovart.spring.service.secure.server.auth.AuthService
 import com.github.titovart.spring.service.secure.server.auth.BasicAuthService
-import com.github.titovart.spring.service.secure.server.controller.ExceptionController
 import com.github.titovart.spring.service.secure.server.controller.ServiceSecureServerController
 import com.github.titovart.spring.service.secure.server.details.ServiceDetailsStore
 import com.github.titovart.spring.service.secure.server.details.jdbc.JdbcServiceDetailsStore
@@ -41,11 +40,6 @@ class ServiceSecureServerConfig : WebMvcConfigurer {
     @Bean
     fun serverServiceController(): ServiceSecureServerController {
         return ServiceSecureServerController()
-    }
-
-    @Bean
-    fun exceptionController(): ExceptionController {
-        return ExceptionController()
     }
 
     @Bean

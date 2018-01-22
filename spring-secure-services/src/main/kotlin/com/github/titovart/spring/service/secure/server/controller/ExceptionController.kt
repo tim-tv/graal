@@ -3,12 +3,9 @@ package com.github.titovart.spring.service.secure.server.controller
 import com.github.titovart.spring.service.secure.server.exception.AuthException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.bind.annotation.*
 
-@RestControllerAdvice(annotations = arrayOf(RestController::class))
+
 class ExceptionController {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
