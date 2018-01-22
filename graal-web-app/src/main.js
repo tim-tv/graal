@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
+import 'js-cookie'
 
 import App from './App'
 import router from './router'

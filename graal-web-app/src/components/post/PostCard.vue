@@ -10,7 +10,7 @@
             <v-icon color="grey">more_vert</v-icon>
           </v-btn>
           <v-list>
-            <v-list-tile class="body-1" @click="" @click.native="dialog = true">modify</v-list-tile>
+            <v-list-tile v-if="isCurrentUser()" class="body-1" @click="" @click.native="dialog = true">modify</v-list-tile>
           </v-list>
         </v-menu>
       </v-card-title>
@@ -26,7 +26,6 @@
       <v-divider class="post-divider grey lighten-1"></v-divider>
 
       <div class="tag-container">
-      <!-- <span>{{ post.user.nickName }}: {{ post.caption }}</span> -->
         <span v-for="tag in post.tags">
           <span class="tag light-blue--text accent-3"> #{{ tag }} </span>
         </span>
@@ -140,6 +139,8 @@ import moment from 'moment'
 
 import {API} from '@/api/api'
 
+const auth = require('@/api/auth')
+
 export default {
   props: ['post'],
 
@@ -164,12 +165,21 @@ export default {
       errorSnackbar: false,
       successSnackbar: false,
       message: 'New post has been updated',
-      postContent: 'asd',
+      postContent: '',
       defaultForm
     }
   },
 
   methods: {
+
+    isAuthenticated () {
+      return auth.isAuthenticated()
+    },
+
+    isCurrentUser () {
+      return auth.isAuthenticated() && (auth.getCurrentUser().id === this.$route.params.id)
+    },
+
     fromNow: function calcTimeFromNow (timestamp) {
       return moment(timestamp).fromNow()
     },
@@ -187,7 +197,7 @@ export default {
     modifyPost () {
       this.dialog = false
 
-      let path = '/users/1/posts/' + this.post.id
+      let path = '/users/' + this.$route.params.id + '/posts/' + this.post.id
       API.put(path, {
         caption: this.form.caption,
         content: this.form.content,

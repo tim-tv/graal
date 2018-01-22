@@ -1,18 +1,34 @@
 <template>
   <v-app>
-  <div id="app">
-    <app-nav></app-nav>
-    <router-view class="app-content"></router-view>
-  </div>
+    <div id="app">
+      <navigation-drawer ref="navigationDrawer" app></navigation-drawer>
+      <app-nav v-on:openDrawer="openDrawer"></app-nav>
+      <router-view class="app-content"></router-view>
+    </div>
   </v-app>
 </template>
 
 <script>
 import AppNav from '@/components/AppNav'
+import NavigationDrawer from '@/components/NavigationDrawer'
 
 export default {
+  data () {
+    return {
+      drawer: true
+    }
+  },
+
+  methods: {
+    openDrawer: function () {
+      this.drawer = true
+      this.$refs.navigationDrawer.showDrawer()
+    }
+  },
+
   components: {
-    AppNav
+    AppNav,
+    NavigationDrawer
   },
 
   name: 'app'

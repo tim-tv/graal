@@ -26,6 +26,9 @@
 import {API} from '@/api/api'
 import PostCard from '@/components/post/PostCard'
 
+const cookie = require('js-cookie')
+const axios = require('axios')
+
 export default {
   components: {
     PostCard
@@ -62,12 +65,13 @@ export default {
     let id = parseInt(this.$route.params.id)
     let path = '/users/' + id + '/posts?size=9'
 
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + cookie.get('access_token')
+
     API.get(path)
     .then(response => {
       this.posts = response.data.content
       this.currentElements = response.numberOfElements
       this.totalElements = response.totalElements
-      console.log('cur: ' + this.currentElements + 'totalElements ' + this.totalElements)
     })
     .catch(e => {
       this.errorMessage = 'Ooops...\n Something went wrong. Please, try later.'

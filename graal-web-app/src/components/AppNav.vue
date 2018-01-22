@@ -1,10 +1,11 @@
 <template>
-  <v-toolbar class="navbar" fixed color="white">
+  <v-toolbar class="navbar" fixed color="white" app>
+     <v-toolbar-side-icon class="grey--text" v-on:click="openDrawer"></v-toolbar-side-icon>
     <v-spacer></v-spacer>
 
     <v-toolbar-title class="navbar-title">Graal</v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-btn icon @click.stop="dialog = true">
+    <v-btn icon @click.stop="dialog = true" v-if="isAuthenticated()">
       <v-icon color="grey">create</v-icon>
     </v-btn>
 
@@ -126,7 +127,10 @@
 <script>
 import {API} from '@/api/api'
 
+const auth = require('@/api/auth')
+
 export default {
+  props: ['drawer'],
 
   data () {
     const defaultForm = Object.freeze({
@@ -154,6 +158,18 @@ export default {
   },
 
   methods: {
+    currentUser () {
+      return auth.getCurrentUser().username
+    },
+
+    isAuthenticated () {
+      return auth.isAuthenticated()
+    },
+
+    openDrawer (event) {
+      this.$emit('openDrawer')
+    },
+
     resetForm () {
       this.form = Object.assign({}, this.defaultForm)
       this.$regs.form.reset()
@@ -167,7 +183,7 @@ export default {
     createPost () {
       this.dialog = false
 
-      let path = '/users/1/posts'
+      let path = '/users/' + auth.getCurrentUser().id + '/posts'
       API.post(path, {
         caption: this.form.caption,
         content: this.form.content,
