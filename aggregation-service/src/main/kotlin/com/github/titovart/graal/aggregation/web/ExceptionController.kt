@@ -43,18 +43,25 @@ class ExceptionController {
         return ResponseEntity(ErrorResponse(exc.responseBodyAsString), exc.statusCode)
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
-    fun handleAuthenticationException(exc: HttpMediaTypeNotSupportedException): ErrorResponse {
-        logger.info("[400] => ${exc.message}")
-        return ErrorResponse(exc.message ?: "Invalid content type.")
-    }
-
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthException::class)
     fun handleAuthenticationException(exc: AuthException): ErrorResponse {
         logger.info("[401] => ${exc.message}")
         return ErrorResponse(exc.message ?: "Unauthorized.")
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleAuthenticationException(exc: ForbiddenException): ErrorResponse {
+        logger.info("[403] => ${exc.message}")
+        return ErrorResponse(exc.message ?: "Forbidden.")
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
+    fun handleAuthenticationException(exc: HttpMediaTypeNotSupportedException): ErrorResponse {
+        logger.info("[400] => ${exc.message}")
+        return ErrorResponse(exc.message ?: "Invalid content type.")
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -110,6 +117,8 @@ class ExceptionController {
 
     companion object {
         class AuthException(msg: String) : RuntimeException(msg)
+
+        class ForbiddenException(msg: String) : RuntimeException(msg)
     }
 
 }

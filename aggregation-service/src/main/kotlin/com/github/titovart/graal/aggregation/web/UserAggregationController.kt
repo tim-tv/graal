@@ -12,6 +12,7 @@ import com.github.titovart.graal.aggregation.entity.post.PostRequest
 import com.github.titovart.graal.aggregation.entity.post.PostResponse
 import com.github.titovart.graal.aggregation.entity.tag.Tag
 import com.github.titovart.graal.aggregation.web.ExceptionController.Companion.AuthException
+import com.github.titovart.graal.aggregation.web.ExceptionController.Companion.ForbiddenException
 import com.netflix.client.ClientException
 import feign.RetryableException
 import org.slf4j.LoggerFactory
@@ -80,7 +81,7 @@ class UserAggregationController(
                    resp: HttpServletResponse): ResponseEntity<Any> {
 
         logger.info("[createPost($userId)] => checking scope permissions")
-        val authResp = checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
+        val authResp = checkPermissionsAndGetAuthResponse(headers, listOf("ui", "api"))
 
         val user = clientSafeGetExec { userClient.getById(userId) }
         logger.info("[createPost($userId)] => received User(id=$userId)")
@@ -124,9 +125,6 @@ class UserAggregationController(
     fun getAllPosts(@PathVariable userId: Long,
                     pageable: Pageable,
                     @RequestHeader headers: HttpHeaders): Page<PostResponse> {
-
-//        logger.info("[getAllPosts($userId)] => checking scope permissions")
-//        checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
 
         logger.info("[getAllPosts($userId)] => getting user")
         val user = clientSafeGetExec { userClient.getById(userId) }
@@ -220,7 +218,7 @@ class UserAggregationController(
     fun getPostById(@PathVariable postId: Long, @RequestHeader headers: HttpHeaders): PartialResponse {
 
         logger.info("[getPostById($postId)] => checking permissions")
-        checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
+        checkPermissionsAndGetAuthResponse(headers, listOf("api"))
 
         logger.info("[getPostById($postId)] => getting post by id = $postId")
         val post = clientSafeGetExec { postClient.getById(postId) }
@@ -385,8 +383,7 @@ class UserAggregationController(
         val isValidScope = scopes.any { resp.oauth2Request.scope.contains(it) }
 
         if (!isValidScope) {
-            logger.error("OAUTH SCOPE: ${resp.oauth2Request.scope}, METHOD SCOPE: $scopes")
-            throw AuthException("Invalid permissions for this scope.")
+            throw ForbiddenException("Invalid permissions for this scope.")
         }
 
         return resp
