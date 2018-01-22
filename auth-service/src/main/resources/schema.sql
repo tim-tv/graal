@@ -50,6 +50,11 @@ create table if not exists oauth_approvals (
   lastModifiedAt TIMESTAMP
 );
 
+create table if not exists authorities (
+  userId VARCHAR(255),
+  authority VARCHAR(255)
+);
+
 create table if not exists ClientDetails (
   appId VARCHAR(255) PRIMARY KEY,
   resourceIds VARCHAR(255),

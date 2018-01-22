@@ -17,7 +17,7 @@ class ResourceServerConfig: ResourceServerConfigurerAdapter() {
                 .requestMatchers().antMatchers("/me", "/new")
                 .and()
                 .authorizeRequests()
-                .antMatchers("/me").access("#oauth2.hasScope('ui')")
+                .antMatchers("/me").access("#oauth2.hasScope('ui') or (#oauth2.hasScope('api'))")
                 .antMatchers("/new").access("#oauth2.hasScope('ui')")
 
     }

@@ -1,6 +1,7 @@
 package com.github.titovart.graal.auth
 
 import com.github.titovart.graal.auth.domain.User
+import com.github.titovart.graal.auth.repository.UserRepository
 import com.github.titovart.graal.auth.service.UserService
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
@@ -14,7 +15,9 @@ import org.springframework.context.annotation.Bean
 class AuthServiceApplication {
 
     @Bean
-    fun init(service: UserService) = CommandLineRunner {
+    fun init(service: UserService, repository: UserRepository) = CommandLineRunner {
+        repository.deleteAll()
+
         val user = User()
         user.setUsername("titart")
         user.setPassword("12345")

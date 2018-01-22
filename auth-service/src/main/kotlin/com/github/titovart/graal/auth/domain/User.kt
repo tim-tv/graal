@@ -1,6 +1,7 @@
 package com.github.titovart.graal.auth.domain
 
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
 
@@ -19,7 +20,7 @@ class User : UserDetails {
     private lateinit var password: String
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return mutableListOf()
+        return mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
     }
 
     fun setUsername(username: String) {
