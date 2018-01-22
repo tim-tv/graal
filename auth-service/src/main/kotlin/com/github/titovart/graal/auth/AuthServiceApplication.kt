@@ -22,6 +22,16 @@ class AuthServiceApplication {
         user.setUsername("titart")
         user.setPassword("12345")
         service.create(user)
+
+        val user2 = User()
+        user2.setUsername("murmur")
+        user2.setPassword("qwerty")
+        service.create(user2)
+
+        val user3 = User()
+        user3.setUsername("mr_robot")
+        user3.setPassword("topsecret")
+        service.create(user3)
     }
 
 
