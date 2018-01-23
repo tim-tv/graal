@@ -34,7 +34,7 @@ apply {
     plugin "org.junit.platform.gradle.plugin"
 }
 
-
+mainClassName = ""
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -48,6 +48,9 @@ dependencyManagement {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.M3"
     }
 }
+
+bootJar.enabled = false
+jar.enabled = true
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")

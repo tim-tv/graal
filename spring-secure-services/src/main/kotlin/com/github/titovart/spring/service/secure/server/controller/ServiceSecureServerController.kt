@@ -5,7 +5,6 @@ import com.github.titovart.spring.service.secure.server.details.ServiceDetails
 import com.github.titovart.spring.service.secure.server.details.ServiceDetailsDto
 import com.github.titovart.spring.service.secure.server.entity.AccessTokenResponse
 import com.github.titovart.spring.service.secure.server.exception.AuthException
-import com.sun.javaws.exceptions.InvalidArgumentException
 import org.apache.commons.codec.binary.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -61,7 +60,7 @@ class ServiceSecureServerController {
         val authData: String
         try {
             authData = StringUtils.newStringUtf8(Base64.getDecoder().decode(token))
-        } catch (exc: InvalidArgumentException) {
+        } catch (exc: IllegalArgumentException) {
             throw AuthException("Auth data must be encoded in base64")
         }
         logger.error("[generateToken] => auth data: $authData")
