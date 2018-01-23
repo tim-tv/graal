@@ -1,6 +1,6 @@
 # Simple social network written in Kotlin and Spring Boot 2
 
-This project is an example of microservices-based application using Kotlin, Spring Boot 2, Spring Clud and Spring OAuth2.
+This project is an example of microservices-based application using Kotlin, Spring Boot 2, Spring Cloud and Spring OAuth2.
 
 # Application architecture
 
@@ -10,7 +10,7 @@ The application incudes 7 services:
  * user-service - User service
  * post-service - Post service
  * aggregation-service - Aggregation service that aggregates data from user, hashtag and post microservices
- * gateway-service - API gateway that is endpoint
+ * gateway-service - Zuul API gateway that is endpoint
  * eureka-service - Eureka server
 
 
