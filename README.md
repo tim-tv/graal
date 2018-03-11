@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/titovart/graal.svg?branch=master)](https://travis-ci.org/titovart/graal)
+
 # Simple social network written in Kotlin and Spring Boot 2
 
 This project is an example of microservices-based application using Kotlin, Spring Boot 2, Spring Cloud and Spring OAuth2.
