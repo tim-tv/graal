@@ -16,8 +16,9 @@ import javax.sql.DataSource
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig(
-        private val userDetailsService: UserDetailsServiceImpl,
-        private val dataSource: DataSource) : WebSecurityConfigurerAdapter() {
+    private val userDetailsService: UserDetailsServiceImpl,
+    private val dataSource: DataSource
+) : WebSecurityConfigurerAdapter() {
 
     override fun configure(auth: AuthenticationManagerBuilder?) {
         auth!!.userDetailsService(userDetailsService).passwordEncoder(BCryptPasswordEncoder())

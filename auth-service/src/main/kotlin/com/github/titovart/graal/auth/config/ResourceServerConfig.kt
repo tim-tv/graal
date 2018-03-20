@@ -8,18 +8,18 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 
 @Configuration
 @EnableResourceServer
-class ResourceServerConfig: ResourceServerConfigurerAdapter() {
+class ResourceServerConfig : ResourceServerConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
         http!!.cors().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .requestMatchers().antMatchers("/me", "/new")
-                .and()
-                .authorizeRequests()
-                .antMatchers("/me").access("#oauth2.hasScope('ui') or (#oauth2.hasScope('api'))")
-                .antMatchers("/new").access("#oauth2.hasScope('ui')")
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .requestMatchers().antMatchers("/me", "/new")
+            .and()
+            .authorizeRequests()
+            .antMatchers("/me").access("#oauth2.hasScope('ui') or (#oauth2.hasScope('api'))")
+            .antMatchers("/new").access("#oauth2.hasScope('ui')")
 
     }
 }
