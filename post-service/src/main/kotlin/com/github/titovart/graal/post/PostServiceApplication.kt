@@ -12,7 +12,8 @@ class PostServiceApplication {
 
     companion object {
 
-        @JvmStatic fun main(args: Array<String>) {
+        @JvmStatic
+        fun main(args: Array<String>) {
             SpringApplication.run(PostServiceApplication::class.java, *args)
         }
     }

@@ -69,16 +69,17 @@ class PostServiceTest {
     @Test
     fun shouldFindByUserId() {
 
-        Mockito.`when`(repository.findByUserId(anyLong(), safeAny(Pageable::class.java))).thenAnswer({
-            val id = it.arguments[0] as Long
-            if (id == 1L) {
-                PageImpl(listOf(getFirstPost(), getSecondPost()))
-            } else if (id == 2L) {
-                PageImpl(listOf(getThirdPost()))
-            } else {
-                throw EntityNotFoundException()
-            }
-        })
+        Mockito.`when`(repository.findByUserId(anyLong(), safeAny(Pageable::class.java)))
+            .thenAnswer({
+                val id = it.arguments[0] as Long
+                if (id == 1L) {
+                    PageImpl(listOf(getFirstPost(), getSecondPost()))
+                } else if (id == 2L) {
+                    PageImpl(listOf(getThirdPost()))
+                } else {
+                    throw EntityNotFoundException()
+                }
+            })
 
         val foundPostByUserId1 = postService.findByUserId(1L, PageRequest.of(1, 10))
         assertEquals(foundPostByUserId1.content, listOf(getFirstPost(), getSecondPost()))
@@ -89,16 +90,17 @@ class PostServiceTest {
 
     @Test(expected = EntityNotFoundException::class)
     fun shouldThrowEntityNotFoundWhenFindPostsByInvalidUserId() {
-        Mockito.`when`(repository.findByUserId(anyLong(), safeAny(Pageable::class.java))).thenAnswer({
-            val id = it.arguments[0] as Long
-            if (id == 1L) {
-                PageImpl(listOf(getFirstPost(), getSecondPost()))
-            } else if (id == 2L) {
-                PageImpl(listOf(getThirdPost()))
-            } else {
-                throw EntityNotFoundException()
-            }
-        })
+        Mockito.`when`(repository.findByUserId(anyLong(), safeAny(Pageable::class.java)))
+            .thenAnswer({
+                val id = it.arguments[0] as Long
+                if (id == 1L) {
+                    PageImpl(listOf(getFirstPost(), getSecondPost()))
+                } else if (id == 2L) {
+                    PageImpl(listOf(getThirdPost()))
+                } else {
+                    throw EntityNotFoundException()
+                }
+            })
 
         val foundPostByUserId1 = postService.findByUserId(1L, PageRequest.of(1, 10))
         assertEquals(foundPostByUserId1.content, listOf(getFirstPost(), getSecondPost()))
@@ -132,6 +134,7 @@ class PostServiceTest {
 
     private fun getThirdPost() = Post("c", "d", 2L, mutableSetOf(3L, 2L), Date(1), Date(2), 3L)
 
+    @Suppress("UNCHECKED_CAST")
     private fun <T> safeAny(clazz: Class<T>): T = any(clazz) ?: null as T
 
 }

@@ -22,8 +22,8 @@ class PostController(private val service: PostService) {
 
     @GetMapping("")
     fun findAll(pageable: Pageable): Page<Post> {
-        return service.findAll(pageable).also {
-            page -> logger.info("[findAll($pageable)] => $page")
+        return service.findAll(pageable).also { page ->
+            logger.info("[findAll($pageable)] => $page")
         }
     }
 
@@ -41,24 +41,25 @@ class PostController(private val service: PostService) {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@Valid @RequestBody postRequest: Post,
-               resp: HttpServletResponse): ResponseEntity<Unit>
-    {
-        service.save(postRequest).also {
-            post ->
-                resp.addHeader(HttpHeaders.LOCATION, "/posts/${post.id}")
-                logger.info("[create($postRequest)] => created")
+    fun create(
+        @Valid @RequestBody postRequest: Post,
+        resp: HttpServletResponse
+    ): ResponseEntity<Unit> {
+        service.save(postRequest).also { post ->
+            resp.addHeader(HttpHeaders.LOCATION, "/posts/${post.id}")
+            logger.info("[create($postRequest)] => created")
         }
 
         return ResponseEntity(HttpStatus.CREATED)
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long,
-               @Valid @RequestBody postRequest: PostRequest): ResponseEntity<Post>
-    {
-        val updatedUser = service.update(id, postRequest).also {
-            post -> logger.info("[update($postRequest) => updated $post")
+    fun update(
+        @PathVariable id: Long,
+        @Valid @RequestBody postRequest: PostRequest
+    ): ResponseEntity<Post> {
+        val updatedUser = service.update(id, postRequest).also { post ->
+            logger.info("[update($postRequest) => updated $post")
         }
 
         return ResponseEntity.ok(updatedUser)

@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.Date
+import java.util.*
 import javax.persistence.EntityNotFoundException
 
 @Service
@@ -61,9 +61,9 @@ class PostServiceImpl(private val repository: PostRepository) : PostService {
      * @return a safety copy of the given post
      */
     private fun Post.safeCopy() = Post(
-            content = this.content,
-            caption = this.caption,
-            userId = this.userId,
-            tags = this.tags
+        content = this.content,
+        caption = this.caption,
+        userId = this.userId,
+        tags = this.tags
     )
 }
