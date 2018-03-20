@@ -26,8 +26,8 @@ class HashTagServiceImpl(private val repository: HashTagRepository) : HashTagSer
 
     @Transactional(readOnly = true)
     override fun findByValue(value: String): HashTag {
-        return repository.findByValue(value) ?:
-                throw EntityNotFoundException("HashTag(value=$value) not found.")
+        return repository.findByValue(value)
+                ?: throw EntityNotFoundException("HashTag(value=$value) not found.")
     }
 
     @Transactional

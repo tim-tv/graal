@@ -52,8 +52,8 @@ class HashtagControllerTest {
         Mockito.`when`(tagService.findByValue(tag.value)).thenReturn(tag)
 
         val actions = mockMvc.perform(get("/hashtags/find?value=${tag.value}"))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 
         assertEqualsTag(actions, tag)
     }
@@ -66,8 +66,8 @@ class HashtagControllerTest {
         Mockito.`when`(tagService.findByValue(tag.value)).thenReturn(tag)
 
         val actions = mockMvc.perform(get("/hashtags/find?value=${tag.value}"))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 
         assertEqualsTag(actions, tag)
 
@@ -81,8 +81,8 @@ class HashtagControllerTest {
         Mockito.`when`(tagService.findById(tag.id)).thenReturn(tag)
 
         val actions = mockMvc.perform(get("/hashtags/{id}", tag.id))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 
         assertEqualsTag(actions, tag)
     }
@@ -95,8 +95,8 @@ class HashtagControllerTest {
         Mockito.`when`(tagService.findById(tag.id)).thenReturn(tag)
 
         val actions = mockMvc.perform(get("/hashtags/{id}", tag.id))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 
         assertEqualsTag(actions, tag)
 
@@ -113,11 +113,13 @@ class HashtagControllerTest {
         val newTag = HashTag("catsarelife")
         val json = mapper.writeValueAsString(newTag)
 
-        mockMvc.perform(post("/hashtags")
+        mockMvc.perform(
+            post("/hashtags")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isCreated)
-                .andExpect(header().string("location", "/hashtags/4"))
+                .content(json)
+        )
+            .andExpect(status().isCreated)
+            .andExpect(header().string("location", "/hashtags/4"))
     }
 
     @Test
@@ -127,7 +129,7 @@ class HashtagControllerTest {
         val tag = createTag()
 
         mockMvc.perform(delete("/hashtags/{id}", tag.id))
-                .andExpect(status().isNoContent)
+            .andExpect(status().isNoContent)
     }
 
     @Test(expected = NestedServletException::class)
@@ -142,18 +144,19 @@ class HashtagControllerTest {
         val tag = createTag()
 
         mockMvc.perform(delete("/hashtags/{id}", tag.id))
-                .andExpect(status().isNoContent)
+            .andExpect(status().isNoContent)
 
         mockMvc.perform(delete("/hashtags/{id}", 123L))
-                .andExpect(status().isNoContent)
+            .andExpect(status().isNoContent)
     }
 
     private fun createTag() = HashTag("happymom", 1L)
 
     private fun assertEqualsTag(actions: ResultActions, tag: HashTag) {
         actions.andExpect(jsonPath("$.id").value(tag.id))
-                .andExpect(jsonPath("$.value").value(tag.value))
+            .andExpect(jsonPath("$.value").value(tag.value))
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun <T> safeAny(): T = any() ?: null as T
 }

@@ -79,7 +79,7 @@ class HashtagServiceTest {
         val allTags = listOf(getFirstTag(), getSecondTag(), getThirdTag())
 
         Mockito.`when`(repository.findAll(ArgumentMatchers.any(Pageable::class.java)))
-                .thenReturn(PageImpl(allTags))
+            .thenReturn(PageImpl(allTags))
 
         val page = tagService.findAll(PageRequest.of(1, 10))
 
