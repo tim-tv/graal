@@ -27,8 +27,9 @@ class ExceptionController {
 
     @ExceptionHandler(HttpServerErrorException::class)
     private fun handleServerErrorException(
-            req: HttpServletRequest,
-            exc: HttpServerErrorException): ResponseEntity<ErrorResponse> {
+        req: HttpServletRequest,
+        exc: HttpServerErrorException
+    ): ResponseEntity<ErrorResponse> {
 
         logger.info("[${exc.statusCode}] => ", exc)
         return ResponseEntity(ErrorResponse(exc.responseBodyAsString), exc.statusCode)
@@ -36,8 +37,9 @@ class ExceptionController {
 
     @ExceptionHandler(HttpClientErrorException::class)
     private fun handleClientErrorException(
-            req: HttpServletRequest,
-            exc: HttpClientErrorException): ResponseEntity<ErrorResponse> {
+        req: HttpServletRequest,
+        exc: HttpClientErrorException
+    ): ResponseEntity<ErrorResponse> {
 
         logger.info("[${exc.statusCode}] => Status: ${exc.statusCode}, Message: ${exc.message}")
         return ResponseEntity(ErrorResponse(exc.responseBodyAsString), exc.statusCode)
@@ -89,16 +91,20 @@ class ExceptionController {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(exc: MethodArgumentNotValidException): ErrorResponse {
         logger.info("[400] => ${exc.bindingResult}")
-        return ErrorResponse(exc.bindingResult.fieldError?.defaultMessage
-                ?: "Invalid method arguments.")
+        return ErrorResponse(
+            exc.bindingResult.fieldError?.defaultMessage
+                    ?: "Invalid method arguments."
+        )
     }
 
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     @ExceptionHandler(ServiceUnavailableException::class)
     fun handleServiceUnavailableException(exc: ServiceUnavailableException): ErrorResponse {
         logger.error("[503] => ${exc.message}")
-        return ErrorResponse("This request is unreachable because one " +
-                "or more services are unavailable now. Please try later.")
+        return ErrorResponse(
+            "This request is unreachable because one " +
+                    "or more services are unavailable now. Please try later."
+        )
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

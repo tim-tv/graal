@@ -67,10 +67,10 @@ class SecureRequestInterceptor : RequestInterceptor {
     }
 
     companion object {
-        val APP_ID = "aggregation-service-id"
-        val APP_SECRET = "aggregation-service-secret"
+        const val APP_ID = "aggregation-service-id"
+        const val APP_SECRET = "aggregation-service-secret"
 
-        val EXPIRATION_SHIFT = 20_000
+        const val EXPIRATION_SHIFT = 20_000
     }
 
 }

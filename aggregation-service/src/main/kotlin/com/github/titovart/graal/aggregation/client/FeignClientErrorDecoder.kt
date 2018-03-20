@@ -41,10 +41,22 @@ class FeignClientErrorDecoder : ErrorDecoder {
 
         return when (response.status()) {
             in 400..500 -> {
-                HttpClientErrorException(statusCode, statusText, responseHeaders, responseBody, null)
+                HttpClientErrorException(
+                    statusCode,
+                    statusText,
+                    responseHeaders,
+                    responseBody,
+                    null
+                )
             }
             in 500..600 -> {
-                HttpServerErrorException(statusCode, statusText, responseHeaders, responseBody, null)
+                HttpServerErrorException(
+                    statusCode,
+                    statusText,
+                    responseHeaders,
+                    responseBody,
+                    null
+                )
             }
             else -> errorStatus(methodKey, response)
         }

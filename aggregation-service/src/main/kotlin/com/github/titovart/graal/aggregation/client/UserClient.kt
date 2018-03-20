@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod
 @FeignClient(name = "user-service")
 interface UserClient : SecureClient {
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/users/{id}")
+    @RequestMapping(method = [RequestMethod.GET], value = ["/users/{id}"])
     fun getById(@PathVariable("id") id: Long): ResponseEntity<UserResponse>
 }

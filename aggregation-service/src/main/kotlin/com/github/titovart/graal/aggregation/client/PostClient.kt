@@ -15,18 +15,20 @@ import org.springframework.web.bind.annotation.RequestParam
 @FeignClient(name = "post-service")
 interface PostClient : SecureClient {
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/posts/{id}")
+    @RequestMapping(method = [RequestMethod.GET], value = ["/posts/{id}"])
     fun getById(@PathVariable("id") id: Long): ResponseEntity<PostFeignResponse>
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/posts/find")
-    fun getByUserId(@RequestParam("user_id") userId: Long,
-                    @RequestParam("page") page: Int = 0,
-                    @RequestParam("size") size: Int = 20): PagedResources<PostFeignResponse>
+    @RequestMapping(method = [RequestMethod.GET], value = ["/posts/find"])
+    fun getByUserId(
+        @RequestParam("user_id") userId: Long,
+        @RequestParam("page") page: Int = 0,
+        @RequestParam("size") size: Int = 20
+    ): PagedResources<PostFeignResponse>
 
 
-    @RequestMapping(method = arrayOf(RequestMethod.PUT), value = "/posts/{id}")
+    @RequestMapping(method = [RequestMethod.PUT], value = ["/posts/{id}"])
     fun update(@PathVariable("id") id: Long, postRequest: PostFeignRequest): ResponseEntity<Unit>
 
-    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/posts")
+    @RequestMapping(method = [RequestMethod.POST], value = ["/posts"])
     fun create(postRequest: PostFeignRequest): ResponseEntity<Unit>
 }

@@ -12,16 +12,16 @@ import org.springframework.web.bind.annotation.RequestParam
 @FeignClient(name = "hashtag-service")
 interface TagClient : SecureClient {
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/hashtags/{id}")
+    @RequestMapping(method = [RequestMethod.GET], value = ["/hashtags/{id}"])
     fun getById(@PathVariable("id") id: Long): ResponseEntity<Tag>
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/hashtags/find")
+    @RequestMapping(method = [RequestMethod.GET], value = ["/hashtags/find"])
     fun getByValue(@RequestParam("value") value: String): ResponseEntity<Tag>
 
-    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/hashtags")
+    @RequestMapping(method = [RequestMethod.POST], value = ["/hashtags"])
     fun create(tagRequest: Tag): ResponseEntity<Unit>
 
-    @RequestMapping(method = arrayOf(RequestMethod.DELETE), value = "/hashtags/{id}")
+    @RequestMapping(method = [RequestMethod.DELETE], value = ["/hashtags/{id}"])
     fun delete(@PathVariable("id") id: Long): ResponseEntity<Unit>
 
 }

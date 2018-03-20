@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod
 @FeignClient(name = "auth-service")
 interface AuthClient {
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "/me")
+    @RequestMapping(method = [RequestMethod.GET], value = ["/me"])
     fun me(@RequestHeader("Authorization") token: String): ResponseEntity<AuthResponse>
 }

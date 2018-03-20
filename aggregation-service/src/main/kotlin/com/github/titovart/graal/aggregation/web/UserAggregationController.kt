@@ -20,7 +20,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.http.*
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.server.ServerErrorException
@@ -36,10 +38,10 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 @RequestMapping("/aggr")
 class UserAggregationController(
-        private val userClient: UserClient,
-        private val postClient: PostClient,
-        private val tagClient: TagClient,
-        private val authClient: AuthClient
+    private val userClient: UserClient,
+    private val postClient: PostClient,
+    private val tagClient: TagClient,
+    private val authClient: AuthClient
 ) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -57,8 +59,10 @@ class UserAggregationController(
         taskExecutorService.submit {
             while (true) {
                 val task = taskQueue.take()
-                logger.info("[executor]:queue[${taskQueue.size}] => " +
-                        "Url: ${task.url}, Description: ${task.description}")
+                logger.info(
+                    "[executor]:queue[${taskQueue.size}] => " +
+                            "Url: ${task.url}, Description: ${task.description}"
+                )
 
                 try {
                     task.body()
@@ -75,10 +79,12 @@ class UserAggregationController(
 
     @PostMapping("/users/{userId}/posts")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createPost(@PathVariable userId: Long,
-                   @RequestBody postRequest: PostRequest,
-                   @RequestHeader headers: HttpHeaders,
-                   resp: HttpServletResponse): ResponseEntity<Any> {
+    fun createPost(
+        @PathVariable userId: Long,
+        @RequestBody postRequest: PostRequest,
+        @RequestHeader headers: HttpHeaders,
+        resp: HttpServletResponse
+    ): ResponseEntity<Any> {
 
         logger.info("[createPost($userId)] => checking scope permissions")
         val authResp = checkPermissionsAndGetAuthResponse(headers, listOf("ui", "api"))
@@ -101,7 +107,7 @@ class UserAggregationController(
         val tags = rollbackResp.values.map { it.id }.toSet()
 
         val postFeignRequest =
-                PostFeignRequest(postRequest.content, postRequest.caption, user.id, tags)
+            PostFeignRequest(postRequest.content, postRequest.caption, user.id, tags)
 
         logger.info("[createPost($userId)] => creating a new post")
         val postResp = try {
@@ -122,15 +128,18 @@ class UserAggregationController(
 
     @GetMapping("/users/{userId}/posts")
     @ResponseStatus(HttpStatus.OK)
-    fun getAllPosts(@PathVariable userId: Long,
-                    pageable: Pageable,
-                    @RequestHeader headers: HttpHeaders): Page<PostResponse> {
+    fun getAllPosts(
+        @PathVariable userId: Long,
+        pageable: Pageable,
+        @RequestHeader headers: HttpHeaders
+    ): Page<PostResponse> {
 
         logger.info("[getAllPosts($userId)] => getting user")
         val user = clientSafeGetExec { userClient.getById(userId) }
 
         logger.info("[getAllPosts($userId)] => getting posts page")
-        val postResp = exec { postClient.getByUserId(userId, pageable.pageNumber, pageable.pageSize) }
+        val postResp =
+            exec { postClient.getByUserId(userId, pageable.pageNumber, pageable.pageSize) }
 
         val content = postResp.content.map {
             logger.info("[getAllPosts($userId)] => getting tags for Post(id=${it.id})")
@@ -138,7 +147,15 @@ class UserAggregationController(
                 safeGetExec { tagClient.getById(tagId) }.value
             }.toMutableSet()
 
-            PostResponse(it.id, it.content, it.caption, user, tags, it.createdDateTime, it.lastModifiedDateTime)
+            PostResponse(
+                it.id,
+                it.content,
+                it.caption,
+                user,
+                tags,
+                it.createdDateTime,
+                it.lastModifiedDateTime
+            )
         }.toMutableList()
 
         logger.info("[getAllPosts($userId)] => all posts have been aggregated")
@@ -148,10 +165,12 @@ class UserAggregationController(
 
     @PutMapping("/users/{userId}/posts/{postId}")
     @ResponseStatus(HttpStatus.OK)
-    fun updatePost(@PathVariable userId: Long,
-                   @PathVariable postId: Long,
-                   @RequestBody postRequest: PostRequest,
-                   @RequestHeader headers: HttpHeaders): ResponseEntity<Any> {
+    fun updatePost(
+        @PathVariable userId: Long,
+        @PathVariable postId: Long,
+        @RequestBody postRequest: PostRequest,
+        @RequestHeader headers: HttpHeaders
+    ): ResponseEntity<Any> {
 
         logger.info("[updatePost($userId)] => checking scope permissions")
         val authResp = checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
@@ -174,7 +193,7 @@ class UserAggregationController(
         val updateTagsFunc = { tags: Set<Long> ->
 
             val postFeignRequest =
-                    PostFeignRequest(postRequest.content, postRequest.caption, user.id, tags)
+                PostFeignRequest(postRequest.content, postRequest.caption, user.id, tags)
 
             clientSafeExec({ postClient.update(postId, postFeignRequest) })
             logger.info("[updatePost($postId)] => the post has been updated")
@@ -190,7 +209,12 @@ class UserAggregationController(
             getTagsFunc()
         } catch (exc: ServiceUnavailableException) {
             logger.info("[updatePost($postId)] => scheduling task because of: $exc")
-            val state = taskQueue.offer(RecoveryTask(url, "[updatePost] => can't get tags", { fullUpdateFunc() }))
+            val state = taskQueue.offer(
+                RecoveryTask(
+                    url,
+                    "[updatePost] => can't get tags",
+                    { fullUpdateFunc() })
+            )
             if (!state) {
                 logger.info("[updatePost($postId)] => couldn't schedule task because queue is full")
                 throw exc
@@ -202,7 +226,12 @@ class UserAggregationController(
             updateTagsFunc(tags)
         } catch (exc: ServiceUnavailableException) {
             logger.info("[updatePost($postId)] => schedule task because of: $exc")
-            val state = taskQueue.offer(RecoveryTask(url, "[updatePost] => can't get tags", { fullUpdateFunc() }))
+            val state = taskQueue.offer(
+                RecoveryTask(
+                    url,
+                    "[updatePost] => can't get tags",
+                    { fullUpdateFunc() })
+            )
             if (!state) {
                 logger.info("[updatePost($postId)] => couldn't schedule task because queue is full")
                 throw exc
@@ -243,9 +272,11 @@ class UserAggregationController(
 
     @GetMapping("/posts/{postId}/tags")
     @ResponseStatus(HttpStatus.OK)
-    fun getTagsByPost(@PathVariable postId: Long,
-                      @RequestHeader headers: HttpHeaders,
-                      pageable: Pageable): Page<Tag> {
+    fun getTagsByPost(
+        @PathVariable postId: Long,
+        @RequestHeader headers: HttpHeaders,
+        pageable: Pageable
+    ): Page<Tag> {
 
         logger.info("[getTagsByPost($postId)] => checking permissions")
         checkPermissionsAndGetAuthResponse(headers, listOf("ui"))
@@ -305,7 +336,8 @@ class UserAggregationController(
             return TagProxy(tag, false)
         }
 
-        val newTagResp = clientSafeExec({ tagClient.create(Tag(value = tagValue)) }, HttpStatus.CREATED)
+        val newTagResp =
+            clientSafeExec({ tagClient.create(Tag(value = tagValue)) }, HttpStatus.CREATED)
         val locationHeader = newTagResp.headers.getFirst(HttpHeaders.LOCATION)
                 ?: throw ServerErrorException("Invalid location header")
         val id = locationHeader.split('/').last().toLong()
@@ -327,8 +359,9 @@ class UserAggregationController(
     }
 
     private fun <T> exec(
-            body: () -> ResponseEntity<T>,
-            exceptStatus: HttpStatus = HttpStatus.OK): ResponseEntity<T> {
+        body: () -> ResponseEntity<T>,
+        exceptStatus: HttpStatus = HttpStatus.OK
+    ): ResponseEntity<T> {
 
         return try {
             exec { body() }
@@ -342,12 +375,13 @@ class UserAggregationController(
     }
 
     private fun <T> clientSafeExec(
-            body: () -> ResponseEntity<T>,
-            validStatus: HttpStatus = HttpStatus.OK): ResponseEntity<T> {
+        body: () -> ResponseEntity<T>,
+        validStatus: HttpStatus = HttpStatus.OK
+    ): ResponseEntity<T> {
 
         val resp = exec { body() }
-        return resp.takeIf { it.statusCode == validStatus } ?:
-                throw ServerErrorException("Expected status $validStatus, but got ${resp.statusCode}.")
+        return resp.takeIf { it.statusCode == validStatus }
+                ?: throw ServerErrorException("Expected status $validStatus, but got ${resp.statusCode}.")
     }
 
     private fun <T> clientSafeGetExec(body: () -> ResponseEntity<T>): T {
@@ -355,8 +389,9 @@ class UserAggregationController(
     }
 
     private fun <T> safeExec(
-            body: () -> ResponseEntity<T>,
-            validStatus: HttpStatus = HttpStatus.OK): ResponseEntity<T> {
+        body: () -> ResponseEntity<T>,
+        validStatus: HttpStatus = HttpStatus.OK
+    ): ResponseEntity<T> {
 
         try {
             return clientSafeExec(body, validStatus)
@@ -373,9 +408,12 @@ class UserAggregationController(
         }
     }
 
-    private fun checkPermissionsAndGetAuthResponse(headers: HttpHeaders, scopes: List<String>): AuthResponse {
-        val token = headers.getFirst(HttpHeaders.AUTHORIZATION) ?:
-                throw AuthException("Access token is not found.")
+    private fun checkPermissionsAndGetAuthResponse(
+        headers: HttpHeaders,
+        scopes: List<String>
+    ): AuthResponse {
+        val token = headers.getFirst(HttpHeaders.AUTHORIZATION)
+                ?: throw AuthException("Access token is not found.")
 
         val resp = exec { authClient.me(token) }.body
                 ?: throw ServerErrorException("Response body is null.")
@@ -391,9 +429,9 @@ class UserAggregationController(
 
     companion object {
         data class RollbackResponse<T>(
-                val values: List<T>,
-                val newValues: List<T>,
-                val exc: Throwable? = null
+            val values: List<T>,
+            val newValues: List<T>,
+            val exc: Throwable? = null
         )
 
         data class TagProxy(val body: Tag, val isNew: Boolean)

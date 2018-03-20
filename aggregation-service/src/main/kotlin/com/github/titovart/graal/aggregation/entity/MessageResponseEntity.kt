@@ -6,10 +6,11 @@ import org.springframework.util.MultiValueMap
 
 
 class MessageResponseEntity<T>(
-        status: HttpStatus,
-        body: T? = null,
-        headers: MultiValueMap<String, String>? = null,
-        val message: String? = null) : ResponseEntity<T>(body, headers, status) {
+    status: HttpStatus,
+    body: T? = null,
+    headers: MultiValueMap<String, String>? = null,
+    val message: String? = null
+) : ResponseEntity<T>(body, headers, status) {
 
     companion object {
         fun <T> fromResp(resp: ResponseEntity<T>): MessageResponseEntity<T> {
