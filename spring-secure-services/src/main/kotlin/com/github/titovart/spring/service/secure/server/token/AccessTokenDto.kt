@@ -4,9 +4,10 @@ import java.sql.Timestamp
 
 
 class AccessTokenDto(
-        private val appId: String,
-        private val value: String,
-        private val expiration: Timestamp = Timestamp(System.currentTimeMillis())) : AccessToken {
+    private val appId: String,
+    private val value: String,
+    private val expiration: Timestamp = Timestamp(System.currentTimeMillis())
+) : AccessToken {
 
     override fun getAppId(): String = appId
 

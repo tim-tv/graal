@@ -3,7 +3,8 @@ package com.github.titovart.spring.service.secure.server.controller
 import com.github.titovart.spring.service.secure.server.exception.AuthException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
 
 
 class ExceptionController {

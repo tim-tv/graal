@@ -66,7 +66,8 @@ class BasicAuthService : AuthService {
     }
 
     private fun generateToken(serviceDetails: ServiceDetails): AccessToken {
-        val data = "${serviceDetails.getAppId()}:${serviceDetails.getAppSecret()}:${random.nextFloat()}"
+        val data =
+            "${serviceDetails.getAppId()}:${serviceDetails.getAppSecret()}:${random.nextFloat()}"
         val token = DigestUtils.md5DigestAsHex(data.toByteArray())
         val expiresAt = Timestamp(System.currentTimeMillis() + EXPIRATION_TIME)
         return AccessTokenDto(serviceDetails.getAppId(), token, expiresAt)

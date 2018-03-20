@@ -2,8 +2,9 @@ package com.github.titovart.spring.service.secure.server.details
 
 
 class ServiceDetailsDto(
-        private val appId: String,
-        private val appSecret: String) : ServiceDetails {
+    private val appId: String,
+    private val appSecret: String
+) : ServiceDetails {
 
     override fun getAppSecret(): String = appSecret
 

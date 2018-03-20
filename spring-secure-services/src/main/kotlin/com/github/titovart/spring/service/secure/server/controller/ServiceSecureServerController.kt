@@ -31,14 +31,17 @@ class ServiceSecureServerController {
 
         val details = extractAuthDataFromHeaders(headers)
 
-        logger.info("[generateToken] => authenticating for " +
-                "${details.getAppId()}:${details.getAppSecret()}")
+        logger.info(
+            "[generateToken] => authenticating for " +
+                    "${details.getAppId()}:${details.getAppSecret()}"
+        )
 
         val token = authService.getOrGenerateToken(details)
         val expiresIn = token.getExpiration().time - Timestamp(System.currentTimeMillis()).time
 
         return ResponseEntity.ok(
-                AccessTokenResponse(token.getValue(), expiresIn, token.getExpiration()))
+            AccessTokenResponse(token.getValue(), expiresIn, token.getExpiration())
+        )
     }
 
 

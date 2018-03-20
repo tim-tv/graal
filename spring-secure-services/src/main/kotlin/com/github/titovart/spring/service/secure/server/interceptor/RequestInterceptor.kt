@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
-import java.lang.Exception
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -22,7 +21,11 @@ class RequestInterceptor : HandlerInterceptorAdapter() {
     @Autowired
     private lateinit var authService: AuthService
 
-    override fun preHandle(request: HttpServletRequest?, response: HttpServletResponse?, handler: Any?): Boolean {
+    override fun preHandle(
+        request: HttpServletRequest?,
+        response: HttpServletResponse?,
+        handler: Any?
+    ): Boolean {
 
         val requestUri = request?.requestURI ?: throw AuthException()
 
