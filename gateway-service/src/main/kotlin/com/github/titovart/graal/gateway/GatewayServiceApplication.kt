@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy
 import org.springframework.context.annotation.Bean
-import org.springframework.web.filter.CorsFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.web.filter.CorsFilter
 
 
 @SpringBootApplication
@@ -35,7 +35,8 @@ class GatewayServiceApplication {
 
     companion object {
 
-        @JvmStatic fun main(args: Array<String>) {
+        @JvmStatic
+        fun main(args: Array<String>) {
             SpringApplication.run(GatewayServiceApplication::class.java, *args)
         }
     }
