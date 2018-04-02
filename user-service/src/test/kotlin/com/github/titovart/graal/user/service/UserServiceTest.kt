@@ -36,7 +36,8 @@ class UserServiceTest {
         Mockito.`when`(repository.findById(anyLong())).thenReturn(Optional.empty())
         Mockito.`when`(repository.findById(1L)).thenReturn(Optional.of(user))
 
-        Mockito.`when`(repository.findAll(any(Pageable::class.java))).thenReturn(PageImpl(getAllUsers()))
+        Mockito.`when`(repository.findAll(any(Pageable::class.java)))
+            .thenReturn(PageImpl(getAllUsers()))
 
         Mockito.`when`(repository.save(any(User::class.java))).thenAnswer({
             val usr = it.arguments[0] as User

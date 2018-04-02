@@ -23,8 +23,8 @@ class UserController(private val service: UserService) {
 
     @GetMapping("")
     fun findAll(pageable: Pageable): Page<User> {
-        return service.findAll(pageable).also {
-            page -> logger.info("[findAll($pageable)] => $page")
+        return service.findAll(pageable).also { page ->
+            logger.info("[findAll($pageable)] => $page")
         }
     }
 
@@ -35,8 +35,8 @@ class UserController(private val service: UserService) {
 
     @GetMapping("/find")
     fun findByUserName(@RequestParam("username") username: String): User {
-        return service.findByUserName(username).also {
-            user -> logger.info("[findByUserName($username)] => $user")
+        return service.findByUserName(username).also { user ->
+            logger.info("[findByUserName($username)] => $user")
         }
     }
 
@@ -52,10 +52,9 @@ class UserController(private val service: UserService) {
             // just check that creating entity is unique so do nothing here
         }
 
-        service.save(userRequest).also {
-            user ->
-                resp.addHeader(HttpHeaders.LOCATION, "/users/${user.id}")
-                logger.info("[create($userRequest)] => created")
+        service.save(userRequest).also { user ->
+            resp.addHeader(HttpHeaders.LOCATION, "/users/${user.id}")
+            logger.info("[create($userRequest)] => created")
         }
 
         return ResponseEntity(HttpStatus.CREATED)
@@ -63,8 +62,8 @@ class UserController(private val service: UserService) {
 
     @PutMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody userRequest: User): ResponseEntity<User> {
-        val updatedUser = service.update(id, userRequest).also {
-            user -> logger.info("[update($userRequest) => updated $user")
+        val updatedUser = service.update(id, userRequest).also { user ->
+            logger.info("[update($userRequest) => updated $user")
         }
 
         return ResponseEntity.ok(updatedUser)

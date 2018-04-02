@@ -54,8 +54,8 @@ class UserControllerTest {
         Mockito.`when`(userService.findById(1L)).thenReturn(user)
 
         val actions = mockMvc.perform(get("/users/{id}", 1L))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 
         buildCheck(actions, user)
     }
@@ -74,8 +74,8 @@ class UserControllerTest {
         Mockito.`when`(userService.findByUserName("jane")).thenReturn(user)
 
         val actions = mockMvc.perform(get("/users/find?username=jane"))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 
         buildCheck(actions, user)
     }
@@ -87,8 +87,8 @@ class UserControllerTest {
         Mockito.`when`(userService.findByUserName("jane")).thenReturn(user)
 
         val actions = mockMvc.perform(get("/users/find?username=jane"))
-                .andExpect(status().isOk)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
 
         buildCheck(actions, user)
 
@@ -104,8 +104,8 @@ class UserControllerTest {
         Mockito.`when`(userService.save(user)).thenReturn(user)
 
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isCreated)
-                .andExpect(header().string("location", "/users/1"))
+            .andExpect(status().isCreated)
+            .andExpect(header().string("location", "/users/1"))
     }
 
     @Test
@@ -125,16 +125,18 @@ class UserControllerTest {
             }
         })
 
-        val actions = mockMvc.perform(put("/users/1").contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isOk)
+        val actions = mockMvc.perform(
+            put("/users/1").contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        )
+            .andExpect(status().isOk)
 
         buildCheck(actions, user)
     }
 
     private fun buildCheck(actions: ResultActions, user: User) {
         actions.andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.nickName").value(user.nickName))
-                .andExpect(jsonPath("$.email").value(user.email))
+            .andExpect(jsonPath("$.nickName").value(user.nickName))
+            .andExpect(jsonPath("$.email").value(user.email))
     }
 }

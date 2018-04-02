@@ -26,7 +26,8 @@ class UserServiceApplication {
 
     companion object {
 
-        @JvmStatic fun main(args: Array<String>) {
+        @JvmStatic
+        fun main(args: Array<String>) {
             SpringApplication.run(UserServiceApplication::class.java, *args)
         }
     }

@@ -24,8 +24,8 @@ class UserServiceImpl(private val repository: UserRepository) : UserService {
 
     @Transactional(readOnly = true)
     override fun findByUserName(username: String): User {
-        return repository.findByNickName(username) ?:
-                throw EntityNotFoundException("User(username=$username) doesn't exist")
+        return repository.findByNickName(username)
+                ?: throw EntityNotFoundException("User(username=$username) doesn't exist")
     }
 
     @Transactional
