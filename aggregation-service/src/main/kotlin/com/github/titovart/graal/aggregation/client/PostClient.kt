@@ -3,7 +3,7 @@ package com.github.titovart.graal.aggregation.client
 import com.github.titovart.graal.aggregation.client.secure.SecureClient
 import com.github.titovart.graal.aggregation.entity.post.PostFeignRequest
 import com.github.titovart.graal.aggregation.entity.post.PostFeignResponse
-import org.springframework.cloud.netflix.feign.FeignClient
+import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.hateoas.PagedResources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
