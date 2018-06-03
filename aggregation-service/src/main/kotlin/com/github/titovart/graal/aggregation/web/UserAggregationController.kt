@@ -1,11 +1,13 @@
 package com.github.titovart.graal.aggregation.web
 
+import com.github.titovart.graal.aggregation.broker.TagStatSender
 import com.github.titovart.graal.aggregation.client.AuthClient
 import com.github.titovart.graal.aggregation.client.PostClient
 import com.github.titovart.graal.aggregation.client.TagClient
 import com.github.titovart.graal.aggregation.client.UserClient
 import com.github.titovart.graal.aggregation.entity.AuthResponse
 import com.github.titovart.graal.aggregation.entity.PartialResponse
+import com.github.titovart.graal.aggregation.entity.TagStatistic
 import com.github.titovart.graal.aggregation.entity.post.PostFeignRequest
 import com.github.titovart.graal.aggregation.entity.post.PostPartialResponse
 import com.github.titovart.graal.aggregation.entity.post.PostRequest
@@ -41,7 +43,8 @@ class UserAggregationController(
     private val userClient: UserClient,
     private val postClient: PostClient,
     private val tagClient: TagClient,
-    private val authClient: AuthClient
+    private val authClient: AuthClient,
+    private val tagStatSender: TagStatSender
 ) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -122,6 +125,12 @@ class UserAggregationController(
         resp.addHeader(HttpHeaders.LOCATION, locationHeader)
 
         logger.info("[createPost($userId)] => a new post has been created: $locationHeader")
+
+        try {
+            tagStatSender.send(TagStatistic(user.nickName, postRequest.tags))
+        } catch (exc: Exception) {
+            logger.error("can't send tag statistic info => $exc")
+        }
 
         return ResponseEntity(HttpStatus.CREATED)
     }

@@ -5,6 +5,18 @@ spring:
   application:
     name: aggregation-service
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    user: guest
+    password: guest
+
+rabbit-mq:
+  tags-stat:
+    queue: tags-stat-queue
+    exchange: tags-stat-exchange
+    routing-key: stat.t
+
 logging:
   level:
     org.springframework.security: INFO
