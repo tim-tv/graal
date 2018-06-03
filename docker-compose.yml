@@ -1,6 +1,13 @@
 version: '2.1'
 services:
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+
   eureka-service:
     image: titart/eureka-service
     container_name: eureka-service
@@ -57,6 +64,18 @@ services:
   aggregation-service:
     image: titart/aggregation-service
     restart: always
+    depends_on:
+      - rabbitmq
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+
+  statistic-service:
+    image: titart/statistic-service
+    restart: always
+    depends_on:
+      - rabbitmq
     logging:
       options:
         max-size: "10m"
