@@ -1,6 +1,13 @@
 version: '2.1'
 services:
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+
   eureka-service:
     build: eureka-service
     ports:
@@ -33,5 +40,14 @@ services:
 
   aggregation-service:
     build: aggregation-service
+    depends_on:
+      - rabbitmq
     ports:
       - 8884:8884
+
+  statistic-service:
+    build: statistic-service
+    depends_on:
+      - rabbitmq
+    ports:
+      - 8886:8886

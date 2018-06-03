@@ -7,6 +7,9 @@ spring:
     refresh:
       enabled: false
 
+  application:
+    name: gateway-service
+
 zuul:
   ignoredServices: '*'
   host:
