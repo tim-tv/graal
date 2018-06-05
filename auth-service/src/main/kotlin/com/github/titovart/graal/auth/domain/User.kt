@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
+import javax.persistence.FetchType
 
 
 @Entity
@@ -19,8 +20,17 @@ class User : UserDetails {
     @Column
     private lateinit var password: String
 
+
+    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "users_roles",
+        joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")]
+    )
+    private var roles = mutableListOf<Role>()
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
+        return roles.map { SimpleGrantedAuthority(it.name) }.toMutableList()
     }
 
     fun setUsername(username: String) {
@@ -29,6 +39,12 @@ class User : UserDetails {
 
     fun setPassword(password: String) {
         this.password = password
+    }
+
+    fun getRoles() = roles.toList()
+
+    fun setRoles(roles: List<Role>) {
+        this.roles = roles.toMutableList()
     }
 
     override fun isEnabled(): Boolean = true

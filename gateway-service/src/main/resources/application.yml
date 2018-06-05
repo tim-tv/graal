@@ -32,7 +32,7 @@ zuul:
       path: /stats/**
       serviceId: statistic-service
       url: http://statistic-service:8886
-      sensetiveHeaders:
+      sensitiveHeaders:
 
 hystrix:
   command:

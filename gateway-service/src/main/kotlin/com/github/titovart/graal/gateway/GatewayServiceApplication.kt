@@ -30,6 +30,7 @@ class GatewayServiceApplication {
         config.addAllowedMethod("DELETE")
         config.addAllowedMethod("PATCH")
         source.registerCorsConfiguration("/**", config)
+        source.registerCorsConfiguration("/stats/**", config)
         return CorsFilter(source)
     }
 
