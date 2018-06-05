@@ -1,6 +1,6 @@
 package com.github.titovart.graal.stat.repository
 
-import com.github.titovart.graal.stat.model.TagUsageStatistic
+import com.github.titovart.graal.stat.domain.TagUsageStatistic
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.PagingAndSortingRepository

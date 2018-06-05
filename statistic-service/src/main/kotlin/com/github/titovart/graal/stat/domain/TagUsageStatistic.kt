@@ -1,4 +1,4 @@
-package com.github.titovart.graal.stat.model
+package com.github.titovart.graal.stat.domain
 
 import javax.persistence.*
 
