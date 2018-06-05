@@ -12,6 +12,9 @@ function putUserInfoToCookies () {
   .then(response => {
     cookie.set('username', response.data.principal.username)
     cookie.set('user_id', response.data.principal.id)
+
+    let isAdmin = response.data.authorities.map(x => x.authority).includes('ROLE_ADMIN')
+    cookie.set('is_admin', isAdmin)
   })
 }
 
@@ -59,6 +62,7 @@ module.exports = {
     cookie.remove('refresh_token')
     cookie.remove('username')
     cookie.remove('user_id')
+    cookie.remove('is_admin')
   },
 
   getCurrentUser: function () {
@@ -69,8 +73,11 @@ module.exports = {
   },
 
   isAuthenticated: function () {
-    console.log('isAuthenticated: ' + cookie.get('access_token'))
     return cookie.get('access_token') != null
+  },
+
+  isAdmin: function () {
+    return cookie.get('is_admin')
   },
 
   setCookie: cookie.set,

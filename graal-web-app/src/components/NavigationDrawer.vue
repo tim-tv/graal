@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="navDrawer" enable-resize-watcher absolute light class="white" app>
+  <v-navigation-drawer v-model="navDrawer" disable-resize-watcher absolute light class="white" app>
 
     <v-snackbar
       v-model="successSnackbar"
@@ -54,8 +54,16 @@
         </v-list-tile-content>
       </v-list-tile>
 
+      <!-- admin tile -->
+      <v-list-tile v-if="isAuthenticated() && isAdmin()" @click="open_admin_panel">
+        <v-list-tile-action>
+          <v-icon>device_hub</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>admin panel</v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
     </v-list>
-
 
     <v-dialog v-model="authDialog" persistent max-width="500px">
       <v-card>
@@ -168,6 +176,14 @@ export default {
       return auth.isAuthenticated()
     },
 
+    isAdmin () {
+      var flag = null
+      if (auth.isAdmin()) {
+        flag = 'ok'
+      }
+      return flag
+    },
+
     showDrawer () {
       this.navDrawer = true
     },
@@ -182,13 +198,17 @@ export default {
       this.navDrawer = false
     },
 
+    open_admin_panel () {
+      this.$router.push('admin')
+    },
+
     resetForm () {
       this.form = Object.assign({}, this.defaultForm)
       this.$regs.form.reset()
     },
 
     authorize () {
-      var errorHandler = error => {
+      var errorHandler = _ => {
         this.form.errorMessage = 'Authorization error. Check your username and password and try again.'
       }
 
