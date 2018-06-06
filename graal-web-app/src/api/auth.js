@@ -3,7 +3,7 @@ const axios = require('axios')
 
 const api = require('@/api/api').API
 
-function putUserInfoToCookies () {
+function putUserInfoToCookies (successCallback) {
   api.get('/uaa/me', {
     headers: {
       'Authorization': 'Bearer ' + getAccessToken()
@@ -15,6 +15,8 @@ function putUserInfoToCookies () {
 
     let isAdmin = response.data.authorities.map(x => x.authority).includes('ROLE_ADMIN')
     cookie.set('is_admin', isAdmin)
+    console.log('SUKA ' + cookie.get('user_id'))
+    successCallback()
   })
 }
 
@@ -47,7 +49,26 @@ module.exports = {
       cookie.set('access_token', response.data.access_token, cookieConfig)
       cookie.set('refresh_token', response.data.access_token, { secure: true })
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token
-      putUserInfoToCookies()
+      putUserInfoToCookies(successCallback)
+    })
+    .catch(error => {
+      errorCallback(error)
+    })
+
+    return true
+  },
+
+  register: function (username, email, password, successCallback, errorCallback) {
+    let path = '/uaa/register'
+
+    let body = {
+      'username': username,
+      'email': email,
+      'password': password
+    }
+
+    api.post(path, body)
+    .then(response => {
       successCallback()
     })
     .catch(error => {
