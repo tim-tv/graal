@@ -14,3 +14,4 @@ cache:
 
 script:
   - ./gradlew check
+  - ./gradlew build
