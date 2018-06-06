@@ -4,5 +4,7 @@ import com.github.titovart.graal.auth.domain.User
 
 interface UserService {
 
-    fun create(user: User)
+    fun create(user: User): User
+
+    fun delete(user: User)
 }

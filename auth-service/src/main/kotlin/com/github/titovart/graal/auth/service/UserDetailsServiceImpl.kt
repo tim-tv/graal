@@ -1,6 +1,7 @@
 package com.github.titovart.graal.auth.service
 
 import com.github.titovart.graal.auth.repository.UserRepository
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
@@ -18,7 +19,13 @@ class UserDetailsServiceImpl(private val repository: UserRepository) : UserDetai
 
         val roles = user.getRoles().map { SimpleGrantedAuthority(it.name) }.toMutableList()
 
-        return User(user.username, user.password, roles)
+        return ExtendUser(user.id, user.username, user.password, roles)
     }
-
 }
+
+data class ExtendUser(
+    val id: Long,
+    private val nickname: String,
+    private val pswd: String,
+    private val roles: MutableCollection<out GrantedAuthority>
+) : User(nickname, pswd, roles)

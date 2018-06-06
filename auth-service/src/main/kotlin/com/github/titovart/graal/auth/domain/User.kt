@@ -1,10 +1,9 @@
 package com.github.titovart.graal.auth.domain
 
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import javax.persistence.*
-import javax.persistence.FetchType
+import kotlin.jvm.Transient
 
 
 @Entity
@@ -14,12 +13,17 @@ class User : UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = -1L
 
-    @Column
+    @Column(unique = true, nullable = false)
     private lateinit var username: String
+
+    @Column(unique = true, nullable = false)
+    private lateinit var email: String
 
     @Column
     private lateinit var password: String
 
+    @Embedded
+    private var authorities: MutableList<out GrantedAuthority> = mutableListOf()
 
     @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @JoinTable(
@@ -30,7 +34,11 @@ class User : UserDetails {
     private var roles = mutableListOf<Role>()
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return roles.map { SimpleGrantedAuthority(it.name) }.toMutableList()
+        return authorities
+    }
+
+    fun setAuthorities(authorities: MutableList<out GrantedAuthority>) {
+        this.authorities = authorities
     }
 
     fun setUsername(username: String) {
@@ -47,6 +55,8 @@ class User : UserDetails {
         this.roles = roles.toMutableList()
     }
 
+    fun getEmail() = email
+
     override fun isEnabled(): Boolean = true
 
     override fun getUsername(): String = username
@@ -58,4 +68,21 @@ class User : UserDetails {
     override fun isAccountNonExpired(): Boolean = true
 
     override fun isAccountNonLocked(): Boolean = true
+
+    companion object {
+        fun create(username: String, email: String, password: String): User {
+            val user = User()
+            user.username = username
+            user.email = email
+            user.password = password
+            user.setRoles(listOf(Role("ROLE_USER")))
+            return user
+        }
+
+        fun createAdmin(username: String, email: String, password: String): User {
+            val user = create(username, email, password)
+            user.setRoles(user.getRoles().plus(Role("ROLE_ADMIN")))
+            return user
+        }
+    }
 }

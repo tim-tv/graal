@@ -15,11 +15,11 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-            .requestMatchers().antMatchers("/me", "/new")
+            .requestMatchers().antMatchers("/me", "/register")
             .and()
             .authorizeRequests()
             .antMatchers("/me").access("#oauth2.hasScope('ui') or (#oauth2.hasScope('api'))")
-            .antMatchers("/new").access("#oauth2.hasScope('ui')")
+            .antMatchers("/register").permitAll()
 
     }
 }
