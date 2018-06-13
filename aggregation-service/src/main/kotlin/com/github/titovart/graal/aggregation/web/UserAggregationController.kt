@@ -129,7 +129,7 @@ class UserAggregationController(
         try {
             tagStatSender.send(TagStatistic(user.nickName, postRequest.tags))
         } catch (exc: Exception) {
-            logger.error("can't send tag statistic info => $exc")
+            logger.error("can't send tag statistic info => ${exc.message}", exc)
         }
 
         return ResponseEntity(HttpStatus.CREATED)
