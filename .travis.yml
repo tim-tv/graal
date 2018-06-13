@@ -31,4 +31,4 @@ deploy:
   provider: script
   script: sh deploy/deploy-all.sh
   on:
-    branch: dev
+    branch: master
