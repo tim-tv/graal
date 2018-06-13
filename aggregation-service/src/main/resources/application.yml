@@ -2,7 +2,6 @@
 # common configs
 server:
   port: ${PORT:8884}
-  rabbitmq: ${RABBITMQ_BIGWIG_TX_URL:amqp://guest:guest@rabbitmq:5672}
 
 rabbit-mq:
   tags-stat:
@@ -24,6 +23,11 @@ logging:
 ---
 spring:
   profiles: dev
+  rabbitmq:
+    host: rabbitmq
+    port: 5671
+    username: guest
+    password: quest
 
 logging:
   level:
@@ -46,6 +50,12 @@ eureka:
 ---
 spring:
   profiles: cloud
+
+  rabbitmq:
+    host: ${CLOUD_AMQP_HOST}
+    username: ${CLOUD_AMQP_USERNAME}
+    password: ${CLOUD_AMQP_PASSWORD}
+
 
 eureka:
   instance:

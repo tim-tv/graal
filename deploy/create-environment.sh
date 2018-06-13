@@ -12,4 +12,4 @@ sh deploy/create-registered-service.sh graal-post ${EUREKA_URL}
 sh deploy/create-registered-service.sh graal-auth ${EUREKA_URL}
 
 sh deploy/create-registered-service.sh graal-aggregation ${EUREKA_URL}
-heroku addons:create rabbitmq-bigwig --app graal-aggregation
+heroku addons:create cloudamqp --app graal-aggregation
