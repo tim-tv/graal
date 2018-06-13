@@ -1,5 +1,3 @@
 #!/usr/bin/env bash
 
-heroku deploy:jar aggregation-service/build/libs/aggregation-service-0.1.0.jar \
-        --spring.profiles.active=cloud --app graal-aggregation
-
+(cd aggregation-service ; heroku deploy:jar -j build/libs/aggregation-service-0.1.0.jar -i Procfile --app graal-aggregation)

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 
-@FeignClient(name = "hashtag-service")
+@FeignClient(name = "hashtag-service", url = "graal-hashtag.herokuapp.com")
 interface TagClient : SecureClient {
 
     @RequestMapping(method = [RequestMethod.GET], value = ["/hashtags/{id}"])

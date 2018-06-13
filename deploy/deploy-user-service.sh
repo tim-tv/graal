@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 
-heroku deploy:jar user-service/build/libs/user-service-0.1.0.jar \
-        --spring.profiles.active=cloud --app graal-user
+(cd user-service ; heroku deploy:jar -j build/libs/user-service-0.1.0.jar -i Procfile --app graal-user)

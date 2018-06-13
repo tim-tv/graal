@@ -3,6 +3,7 @@ package com.github.titovart.graal.user
 import com.github.titovart.graal.user.model.User
 import com.github.titovart.graal.user.repository.UserRepository
 import com.github.titovart.graal.user.service.UserService
+import com.github.titovart.spring.service.secure.server.EnableServiceSecureServer
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Bean
 
 @EnableEurekaClient
 @SpringBootApplication
+@EnableServiceSecureServer
 class UserServiceApplication {
 
     @Bean

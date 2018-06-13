@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 
-heroku deploy:jar post-service/build/libs/post-service-0.1.0.jar \
-        --spring.profiles.active=cloud --app graal-post
+(cd post-service ; heroku deploy:jar -j build/libs/post-service-0.1.0.jar -i Procfile --app graal-post)

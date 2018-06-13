@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 
-heroku deploy:jar auth-service/build/libs/auth-service-0.1.0.jar \
-        --spring.profiles.active=cloud --app graal-auth
+(cd auth-service ; heroku deploy:jar -j build/libs/auth-service-0.1.0.jar -i Procfile --app graal-auth)

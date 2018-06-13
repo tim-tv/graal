@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 
 
-@FeignClient(name = "post-service")
+@FeignClient(name = "post-service", url = "graal-post.herokuapp.com")
 interface PostClient : SecureClient {
 
     @RequestMapping(method = [RequestMethod.GET], value = ["/posts/{id}"])
