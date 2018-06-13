@@ -12,6 +12,22 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
+addons:
+  apt:
+    sources:
+      - heroku
+    packages:
+      - heroku-toolbelt
+
+before_script:
+  - heroku plugins:install heroku-cli-deploy
+
 script:
   - ./gradlew check
   - ./gradlew build
+
+deploy:
+  provider: script
+  script: sh deploy/deploy-all.sh
+  on:
+    branch: dev
