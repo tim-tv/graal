@@ -16,3 +16,4 @@ heroku addons:create cloudamqp --app graal-aggregation
 
 sh deploy/create-registered-service.sh graal-statistic ${EUREKA_URL}
 
+sh deploy/create-registered-service.sh graal-gateway ${EUREKA_URL}
