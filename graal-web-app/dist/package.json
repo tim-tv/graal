@@ -1,0 +1,14 @@
+{
+ "name": "grall-web-app",
+ "version": "1.0.0",
+ "description": "Graal",
+ "author": "Titov Artem",
+ "private": true,
+ "scripts": {
+  "postinstall": "npm install express"
+ },
+ "dependencies": {
+  "express": "^4.16.3",
+  "serve-static": "^1.13.2"
+ }
+}

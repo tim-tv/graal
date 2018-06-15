@@ -330,7 +330,12 @@ export default {
       }
 
       var successHandler = () => {
-        this.$router.push({ name: 'users' , params: { id: auth.getCurrentUser().id }})
+        this.$router.push({
+          name: 'users',
+          params: {
+            id: auth.getCurrentUser().id
+          }
+        })
         this.authDialog = false
         this.resetForm()
       }

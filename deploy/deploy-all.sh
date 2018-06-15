@@ -8,3 +8,4 @@ sh deploy/deploy-post-service.sh
 sh deploy/deploy-aggregation-service.sh
 sh deploy/deploy-gateway-service.sh
 sh deploy/deploy-statistic-service.sh
+sh deploy/deploy-frontend.sh
