@@ -22,13 +22,13 @@ addons:
 before_script:
   - heroku plugins:install heroku-cli-deploy
 
-script:
-  - ./gradlew check
-  - ./gradlew build
+#script:
+#  - ./gradlew check
+#  - ./gradlew build
 
 deploy:
   skip_cleanup: true
   provider: script
-  script: sh deploy/deploy-all.sh
+  script: sh deploy/deploy-frontend.sh
   on:
     branch: deploy
