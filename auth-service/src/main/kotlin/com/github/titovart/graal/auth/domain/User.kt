@@ -7,6 +7,7 @@ import kotlin.jvm.Transient
 
 
 @Entity
+@Table(name = "users")
 class User : UserDetails {
 
     @Id

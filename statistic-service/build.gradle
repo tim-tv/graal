@@ -70,6 +70,7 @@ dependencies {
 
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
     compile("com.h2database:h2")
+    compile("org.postgresql:postgresql")
     compile("commons-io:commons-io:2.5")
 
     compile("org.jetbrains.kotlin:kotlin-stdlib")
