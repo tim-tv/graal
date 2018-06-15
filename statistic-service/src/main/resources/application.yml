@@ -18,6 +18,10 @@ logging:
   level:
     feign: DEBUG
 
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 # dev configs
 ---
@@ -57,6 +61,7 @@ spring:
 
   rabbitmq:
     host: ${CLOUD_AMQP_HOST}
+    virtual-host: ${CLOUD_AMQP_VHOST}
     username: ${CLOUD_AMQP_USERNAME}
     password: ${CLOUD_AMQP_PASSWORD}
 
