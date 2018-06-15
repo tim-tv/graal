@@ -30,4 +30,5 @@ deploy:
   skip_cleanup: true
   provider: script
   script: sh deploy/deploy-all.sh
-
+  on:
+    branch: deploy
