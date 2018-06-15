@@ -12,3 +12,4 @@ create table service_secure_details (
 );
 
 insert into service_secure_details values('aggregation-service-id', 'aggregation-service-secret');
+insert into service_secure_details values('auth-service-id', 'auth-service-secret');
