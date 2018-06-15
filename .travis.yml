@@ -25,6 +25,9 @@ before_script:
 script:
   - ./gradlew check
 #  - ./gradlew build
+  - heroku git:remote -a graal-frontend
+  - git push heroku `git subtree split --prefix graal-web-app/dist master`:master --force
+
 
 deploy:
   skip_cleanup: true
