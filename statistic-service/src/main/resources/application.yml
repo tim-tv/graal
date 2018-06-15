@@ -29,6 +29,10 @@ spring:
     username: guest
     password: quest
 
+  datasource:
+    url: jdbc:h2:file:~/stat-db;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+
 logging:
   level:
     org.springframework.security: INFO
@@ -56,6 +60,18 @@ spring:
     username: ${CLOUD_AMQP_USERNAME}
     password: ${CLOUD_AMQP_PASSWORD}
 
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    url: ${JDBC_DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
 
 eureka:
   instance:

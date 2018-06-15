@@ -6,6 +6,7 @@ import javax.validation.constraints.Size
 
 
 @Entity
+@Table(name = "users")
 data class User(
     @Column(nullable = false, unique = true)
     @field:Size(min = 1, max = 30, message = "Username size must be in range [1, 30].")
