@@ -300,6 +300,7 @@ export default {
     logout () {
       auth.logout()
       this.navDrawer = false
+      this.$forceUpdate()
     },
 
     open_admin_panel () {
@@ -320,6 +321,7 @@ export default {
       var successHandler = () => {
         this.registerDialog = false
         this.resetForm()
+        this.$forceUpdate()
       }
       auth.register(this.registerForm.username, this.registerForm.email, this.registerForm.password, successHandler, errorHandler)
     },
@@ -338,6 +340,7 @@ export default {
         })
         this.authDialog = false
         this.resetForm()
+        this.$forceUpdate()
       }
       auth.login(this.loginForm.username, this.loginForm.password, successHandler, errorHandler)
     }
